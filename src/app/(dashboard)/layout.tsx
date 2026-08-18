@@ -23,7 +23,7 @@ export default async function DashboardLayout({
       </div>
 
       {/* Main content */}
-      <main className="p-4 pb-28 md:p-8 md:pb-16 flex-1 min-h-screen bg-[#0b0b0f] overflow-y-auto">
+      <main className="dashboard-main-container flex-1 min-h-screen bg-[#0b0b0f] overflow-y-auto">
         <div style={{ maxWidth: '1360px', margin: '0 auto' }}>
           {children}
         </div>

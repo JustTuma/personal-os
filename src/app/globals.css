@@ -109,6 +109,23 @@ body {
 .animate-fade-in { animation: fadeIn 0.2s ease-out; }
 .animate-slide-in { animation: slideIn 0.18s ease-out; }
 
+/* ── Dashboard Safe-Area Container for Mobile & Desktop ── */
+.dashboard-main-container {
+  padding-top: calc(env(safe-area-inset-top, 44px) + 20px);
+  padding-bottom: calc(env(safe-area-inset-bottom, 24px) + 96px);
+  padding-left: calc(env(safe-area-inset-left, 0px) + 20px);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 20px);
+}
+
+@media (min-width: 768px) {
+  .dashboard-main-container {
+    padding-top: 32px;
+    padding-bottom: 64px;
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+}
+
 /* ── Recharts Tooltip Reset ── */
 .recharts-default-tooltip {
   background-color: #181820 !important;
@@ -122,4 +139,5 @@ body {
   outline: none !important;
   border: none !important;
 }
+
 

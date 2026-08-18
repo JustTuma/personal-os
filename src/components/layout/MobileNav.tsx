@@ -55,15 +55,15 @@ export function MobileNav() {
           left: 0,
           right: 0,
           zIndex: 40,
-          backgroundColor: 'rgba(17, 17, 23, 0.95)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          backgroundColor: 'rgba(17, 17, 23, 0.96)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingBottom: 'calc(18px + env(safe-area-inset-bottom, 20px))',
-          paddingTop: '10px',
+          paddingTop: '8px',
+          paddingBottom: 'calc(env(safe-area-inset-bottom, 16px) + 6px)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 8px' }}>
           {primaryNav.map(({ href, label, icon: Icon }) => {
             const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
 
@@ -76,17 +76,17 @@ export function MobileNav() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '4px',
-                  padding: '6px 10px',
-                  borderRadius: '10px',
+                  gap: '3px',
+                  padding: '4px 8px',
+                  borderRadius: '8px',
                   textDecoration: 'none',
-                  minWidth: '56px',
+                  minWidth: '52px',
                   color: isActive ? '#818cf8' : '#707082',
                   transition: 'color 120ms',
                 }}
               >
-                <Icon size={20} color={isActive ? '#818cf8' : '#707082'} />
-                <span style={{ fontSize: '11px', fontWeight: isActive ? 600 : 500 }}>{label}</span>
+                <Icon size={19} color={isActive ? '#818cf8' : '#707082'} />
+                <span style={{ fontSize: '10.5px', fontWeight: isActive ? 600 : 500 }}>{label}</span>
               </Link>
             )
           })}
@@ -99,18 +99,18 @@ export function MobileNav() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '4px',
-              padding: '6px 10px',
-              borderRadius: '10px',
+              gap: '3px',
+              padding: '4px 8px',
+              borderRadius: '8px',
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              minWidth: '56px',
+              minWidth: '52px',
               color: isMoreActive || drawerOpen ? '#818cf8' : '#707082',
             }}
           >
-            {drawerOpen ? <X size={20} color="#818cf8" /> : <Menu size={20} color={isMoreActive ? '#818cf8' : '#707082'} />}
-            <span style={{ fontSize: '11px', fontWeight: isMoreActive || drawerOpen ? 600 : 500 }}>
+            {drawerOpen ? <X size={19} color="#818cf8" /> : <Menu size={19} color={isMoreActive ? '#818cf8' : '#707082'} />}
+            <span style={{ fontSize: '10.5px', fontWeight: isMoreActive || drawerOpen ? 600 : 500 }}>
               {drawerOpen ? 'Cerrar' : 'Más'}
             </span>
           </button>
