@@ -1,14 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { TutorialModal } from '@/components/shared/TutorialModal'
 import {
   LayoutDashboard, Wallet, Building2, RefreshCw, Target,
   CheckSquare, FolderOpen, FileText, BarChart3, Settings,
-  LogOut, Zap
+  LogOut, HelpCircle
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 const navItems = [
@@ -26,6 +27,7 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const [showTutorial, setShowTutorial] = useState(false)
 
   async function handleLogout() {
     const supabase = createClient()
@@ -136,6 +138,36 @@ export function Sidebar() {
         gap: '3px',
         flexShrink: 0,
       }}>
+        <button
+          onClick={() => setShowTutorial(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            padding: '9px 12px',
+            borderRadius: '8px',
+            fontSize: '13.5px',
+            color: '#a0a0b0',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            width: '100%',
+            textAlign: 'left',
+            transition: 'background 120ms, color 120ms',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)'
+            e.currentTarget.style.color = '#f2f2f8'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+            e.currentTarget.style.color = '#a0a0b0'
+          }}
+        >
+          <HelpCircle size={17} color="#a0a0b0" />
+          <span>Guía de uso</span>
+        </button>
+
         <Link
           href="/settings"
           style={{
@@ -154,6 +186,7 @@ export function Sidebar() {
           <Settings size={17} color={pathname === '/settings' ? '#818cf8' : '#707082'} />
           <span>Configuración</span>
         </Link>
+
         <button
           onClick={handleLogout}
           style={{
@@ -184,6 +217,11 @@ export function Sidebar() {
           <span>Cerrar sesión</span>
         </button>
       </div>
+
+      <TutorialModal
+        isOpen={showTutorial}
+        onClose={() => setShowTutorial(false)}
+      />
     </aside>
   )
 }
