@@ -59,8 +59,8 @@ export function MobileNav() {
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          paddingBottom: 'max(8px, env(safe-area-inset-bottom, 12px))',
-          paddingTop: '6px',
+          paddingBottom: 'calc(18px + env(safe-area-inset-bottom, 20px))',
+          paddingTop: '10px',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '0 6px' }}>

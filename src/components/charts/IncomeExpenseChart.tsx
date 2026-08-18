@@ -59,7 +59,7 @@ export function IncomeExpenseChart({ data, currency }: IncomeExpenseChartProps) 
 
   return (
     <ResponsiveContainer width="100%" height={220}>
-      <BarChart data={data} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barGap={4}>
+      <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }} barGap={4}>
         <CartesianGrid
           strokeDasharray="3 3"
           stroke="rgba(255, 255, 255, 0.05)"
