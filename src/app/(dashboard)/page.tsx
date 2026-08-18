@@ -306,11 +306,7 @@ export default function DashboardPage() {
               Moneda: {s.currency}
             </p>
           )}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px',
-          }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
             <StatCard
               label="Dinero disponible"
               value={s.accountBalance}
@@ -345,15 +341,11 @@ export default function DashboardPage() {
       ))}
 
       {/* Chart + Recent Activity */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-        gap: '20px',
-      }}>
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 w-full">
         {/* Chart */}
         <div style={{ minWidth: 0 }}>
           <SectionCard title="Ingresos vs Gastos (ARS) — Últimos 6 meses">
-            <div style={{ padding: '20px' }}>
+            <div className="p-2 sm:p-5">
               <IncomeExpenseChart data={chartData} currency="ARS" />
             </div>
           </SectionCard>
@@ -463,7 +455,7 @@ export default function DashboardPage() {
             </Button>
           }
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px', padding: '16px 20px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-3 sm:p-5">
             {activeSubscriptions.map(sub => (
               <div
                 key={sub.id}
@@ -504,7 +496,7 @@ export default function DashboardPage() {
             </Button>
           }
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '14px', padding: '16px 20px' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-3 sm:p-5">
             {activeGoals.map(g => {
               const progress = Math.min(100, Math.round((g.current_amount / g.target_amount) * 100))
               return (
