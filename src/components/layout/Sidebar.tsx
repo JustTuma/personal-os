@@ -57,18 +57,17 @@ export function Sidebar() {
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         flexShrink: 0,
       }}>
-        <div style={{
-          width: '30px',
-          height: '30px',
-          borderRadius: '8px',
-          backgroundColor: '#6366f1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-        }}>
-          <Zap size={16} color="white" />
-        </div>
+        <img
+          src="/icon-192.png"
+          alt="Personal OS Logo"
+          style={{
+            width: '30px',
+            height: '30px',
+            borderRadius: '8px',
+            objectFit: 'cover',
+            flexShrink: 0,
+          }}
+        />
         <span style={{
           fontWeight: 600,
           fontSize: '15px',
