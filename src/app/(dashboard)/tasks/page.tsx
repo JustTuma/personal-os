@@ -10,20 +10,12 @@ import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/Skeleton'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { CheckSquare, Plus, Search } from 'lucide-react'
+import { CheckSquare, Plus, Search, AlertTriangle, CheckCircle2, Clock } from 'lucide-react'
 import type { TaskWithRelations } from '@/types'
 import type { TaskFormValues } from '@/lib/validations/task'
 
 export default function TasksPage() {
-  const {
-    tasks,
-    isLoading,
-    createTask,
-    updateTask,
-    deleteTask,
-    toggleTask,
-  } = useTasks()
-
+  const { tasks, isLoading, createTask, updateTask, deleteTask, toggleTask } = useTasks()
   const { projects } = useProjects()
 
   const [showCreate, setShowCreate] = useState(false)
@@ -36,29 +28,20 @@ export default function TasksPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Calculations for summary stats
   const stats = useMemo(() => {
     const total = tasks.length
     const completed = tasks.filter(t => t.status === 'completed').length
     const pending = total - completed
     const urgent = tasks.filter(t => t.status !== 'completed' && (t.priority === 'urgent' || t.priority === 'high')).length
-
     return { total, completed, pending, urgent }
   }, [tasks])
 
-  // Filtered tasks
   const filteredTasks = useMemo(() => {
     return tasks.filter(t => {
-      // Status filter
       if (filter === 'todo' && t.status === 'completed') return false
       if (filter === 'completed' && t.status !== 'completed') return false
-
-      // Project filter
       if (selectedProject !== 'all' && t.project_id !== selectedProject) return false
-
-      // Search
       if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
-
       return true
     })
   }, [tasks, filter, selectedProject, search])
@@ -82,51 +65,41 @@ export default function TasksPage() {
 
   async function handleCreateModal(values: TaskFormValues) {
     setIsSubmitting(true)
-    try {
-      await createTask(values)
-      setShowCreate(false)
-    } finally {
-      setIsSubmitting(false)
-    }
+    try { await createTask(values); setShowCreate(false) }
+    finally { setIsSubmitting(false) }
   }
 
   async function handleUpdate(values: TaskFormValues) {
     if (!editing) return
     setIsSubmitting(true)
-    try {
-      await updateTask(editing.id, values)
-      setEditing(null)
-    } finally {
-      setIsSubmitting(false)
-    }
+    try { await updateTask(editing.id, values); setEditing(null) }
+    finally { setIsSubmitting(false) }
   }
 
   async function handleDelete() {
     if (!deleting) return
     setIsDeleting(true)
-    try {
-      await deleteTask(deleting.id)
-      setDeleting(null)
-    } finally {
-      setIsDeleting(false)
-    }
+    try { await deleteTask(deleting.id); setDeleting(null) }
+    finally { setIsDeleting(false) }
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
+      <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Tareas
-          </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '999px',
+            backgroundColor: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)',
+            marginBottom: '10px',
+          }}>
+            <CheckSquare size={11} color="#34d399" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#34d399', letterSpacing: '0.04em' }}>Productividad</span>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>Tareas</h1>
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
             {stats.pending} pendientes · {stats.completed} completadas
           </p>
         </div>
@@ -135,28 +108,60 @@ export default function TasksPage() {
         </Button>
       </div>
 
-      {/* Quick Add Bar */}
-      <form onSubmit={handleQuickAdd} style={{
-        display: 'flex',
-        gap: '10px',
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '12px',
-        padding: '8px 12px',
-      }}>
+      {/* KPI Mini Stats */}
+      <div className="grid grid-cols-3 gap-3 stagger animate-slide-up">
+        <div className="stat-card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: 'rgba(124,58,237,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Clock size={16} color="#a78bfa" />
+            </div>
+            <div>
+              <p style={{ fontSize: '22px', fontWeight: 700, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>{stats.pending}</p>
+              <p style={{ fontSize: '11px', color: '#55556a', margin: 0, fontWeight: 500 }}>Pendientes</p>
+            </div>
+          </div>
+        </div>
+        <div className="stat-card stat-card-positive">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <CheckCircle2 size={16} color="#10b981" />
+            </div>
+            <div>
+              <p className="gradient-text-green" style={{ fontSize: '22px', fontWeight: 700, margin: 0, letterSpacing: '-0.03em' }}>{stats.completed}</p>
+              <p style={{ fontSize: '11px', color: '#55556a', margin: 0, fontWeight: 500 }}>Completadas</p>
+            </div>
+          </div>
+        </div>
+        <div className={`stat-card ${stats.urgent > 0 ? 'stat-card-negative' : ''}`}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '34px', height: '34px', borderRadius: '9px', backgroundColor: stats.urgent > 0 ? 'rgba(239,68,68,0.12)' : 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <AlertTriangle size={16} color={stats.urgent > 0 ? '#ef4444' : '#55556a'} />
+            </div>
+            <div>
+              <p style={{ fontSize: '22px', fontWeight: 700, color: stats.urgent > 0 ? '#f87171' : '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>{stats.urgent}</p>
+              <p style={{ fontSize: '11px', color: '#55556a', margin: 0, fontWeight: 500 }}>Urgentes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Add */}
+      <form onSubmit={handleQuickAdd} className="glass-card animate-fade-in" style={{ display: 'flex', gap: '10px', padding: '10px 14px' }}>
+        <div style={{
+          width: '28px', height: '28px', borderRadius: '7px', flexShrink: 0,
+          backgroundColor: 'rgba(52,211,153,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          alignSelf: 'center',
+        }}>
+          <Plus size={15} color="#34d399" />
+        </div>
         <input
           type="text"
           placeholder="Escribí una tarea y presioná Enter..."
           value={quickTitle}
           onChange={(e) => setQuickTitle(e.target.value)}
           style={{
-            flex: 1,
-            backgroundColor: 'transparent',
-            border: 'none',
-            outline: 'none',
-            fontSize: '14px',
-            color: '#f2f2f8',
-            padding: '4px 8px',
+            flex: 1, backgroundColor: 'transparent', border: 'none', outline: 'none',
+            fontSize: '14px', color: '#eeeeff', padding: '4px 0',
           }}
         />
         <Button type="submit" size="sm" isLoading={isSubmitting} disabled={!quickTitle.trim()}>
@@ -164,31 +169,14 @@ export default function TasksPage() {
         </Button>
       </form>
 
-      {/* Filter & Search Controls */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-      }}>
-        {/* Status Tabs */}
-        <div style={{ display: 'flex', gap: '6px' }}>
+      {/* Filters */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+        <div className="filter-tabs" style={{ border: 'none', paddingBottom: 0 }}>
           {(['todo', 'all', 'completed'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                backgroundColor: filter === tab ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                color: filter === tab ? '#818cf8' : '#a0a0b0',
-                fontSize: '13px',
-                fontWeight: filter === tab ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 120ms',
-              }}
+              className={`filter-tab ${filter === tab ? 'filter-tab-active' : ''}`}
             >
               {tab === 'todo' && `Pendientes (${stats.pending})`}
               {tab === 'all' && `Todas (${stats.total})`}
@@ -197,51 +185,34 @@ export default function TasksPage() {
           ))}
         </div>
 
-        {/* Project Selector & Search */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           {projects.length > 0 && (
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
               style={{
-                height: '34px',
-                padding: '0 12px',
-                borderRadius: '8px',
-                backgroundColor: '#181820',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: '#a0a0b0',
-                fontSize: '13px',
-                outline: 'none',
-                cursor: 'pointer',
+                height: '34px', padding: '0 12px', borderRadius: '999px',
+                backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-medium)',
+                color: '#9898b8', fontSize: '12.5px', outline: 'none', cursor: 'pointer',
               }}
             >
               <option value="all">Todos los proyectos</option>
-              {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
+              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           )}
-
-          <div style={{ position: 'relative', width: '200px' }}>
+          <div style={{ position: 'relative' }}>
             <input
               type="text"
               placeholder="Buscar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               style={{
-                width: '100%',
-                height: '34px',
-                paddingLeft: '32px',
-                paddingRight: '12px',
-                borderRadius: '8px',
-                backgroundColor: '#181820',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: '#f2f2f8',
-                fontSize: '13px',
-                outline: 'none',
+                width: '180px', height: '34px', paddingLeft: '32px', paddingRight: '12px',
+                borderRadius: '999px', backgroundColor: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--border-medium)', color: '#eeeeff', fontSize: '12.5px', outline: 'none',
               }}
             />
-            <Search size={14} color="#646473" style={{ position: 'absolute', left: '10px', top: '10px' }} />
+            <Search size={13} color="#55556a" style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)' }} />
           </div>
         </div>
       </div>
@@ -252,13 +223,7 @@ export default function TasksPage() {
           {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
         </div>
       ) : filteredTasks.length === 0 ? (
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}>
+        <div className="glass-card" style={{ padding: '56px 24px', textAlign: 'center' }}>
           <EmptyState
             icon={CheckSquare}
             title={filter === 'todo' ? 'No tenés tareas pendientes' : 'No hay tareas en esta vista'}
@@ -268,45 +233,22 @@ export default function TasksPage() {
           />
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {filteredTasks.map(task => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              onToggle={toggleTask}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-            />
+        <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {filteredTasks.map((task, i) => (
+            <div key={task.id} className="animate-slide-up" style={{ animationDelay: `${i * 40}ms` }}>
+              <TaskItem task={task} onToggle={toggleTask} onEdit={setEditing} onDelete={setDeleting} />
+            </div>
           ))}
         </div>
       )}
 
-      {/* Create Modal */}
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Nueva tarea">
         <TaskForm onSubmit={handleCreateModal} onCancel={() => setShowCreate(false)} isLoading={isSubmitting} />
       </Modal>
-
-      {/* Edit Modal */}
       <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Editar tarea">
-        {editing && (
-          <TaskForm
-            defaultValues={editing}
-            onSubmit={handleUpdate}
-            onCancel={() => setEditing(null)}
-            isLoading={isSubmitting}
-          />
-        )}
+        {editing && <TaskForm defaultValues={editing} onSubmit={handleUpdate} onCancel={() => setEditing(null)} isLoading={isSubmitting} />}
       </Modal>
-
-      {/* Delete Confirm */}
-      <ConfirmDialog
-        isOpen={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        isLoading={isDeleting}
-        title="Eliminar tarea"
-        description={`¿Querés eliminar "${deleting?.title}"?`}
-      />
+      <ConfirmDialog isOpen={!!deleting} onClose={() => setDeleting(null)} onConfirm={handleDelete} isLoading={isDeleting} title="Eliminar tarea" description={`¿Querés eliminar "${deleting?.title}"?`} />
     </div>
   )
 }

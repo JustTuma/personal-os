@@ -179,20 +179,23 @@ export default function ReportsPage() {
   }, [periodTransactions, accounts])
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
+      <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Reportes y Estadísticas
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '999px',
+            backgroundColor: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.25)',
+            marginBottom: '10px',
+          }}>
+            <BarChart3 size={11} color="#60a5fa" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#60a5fa', letterSpacing: '0.04em' }}>Análisis</span>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>
+            Reportes
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
             Análisis financiero de ingresos, gastos y hábitos de ahorro
           </p>
         </div>
@@ -200,9 +203,10 @@ export default function ReportsPage() {
         {/* Currency Switch */}
         <div style={{
           display: 'flex',
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '10px',
+          background: 'var(--bg-card)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid var(--border-medium)',
+          borderRadius: '999px',
           padding: '3px',
         }}>
           {(['ARS', 'USD'] as Currency[]).map(curr => (
@@ -210,15 +214,16 @@ export default function ReportsPage() {
               key={curr}
               onClick={() => setCurrency(curr)}
               style={{
-                padding: '6px 14px',
-                borderRadius: '7px',
+                padding: '6px 16px',
+                borderRadius: '999px',
                 border: 'none',
-                backgroundColor: currency === curr ? '#6366f1' : 'transparent',
-                color: currency === curr ? '#ffffff' : '#a0a0b0',
+                background: currency === curr ? 'linear-gradient(135deg, #7c3aed, #6366f1)' : 'transparent',
+                color: currency === curr ? '#ffffff' : '#7070a0',
                 fontSize: '13px',
                 fontWeight: 600,
                 cursor: 'pointer',
-                transition: 'all 120ms',
+                transition: 'all 180ms',
+                boxShadow: currency === curr ? '0 0 12px rgba(124,58,237,0.4)' : 'none',
               }}
             >
               {curr}
@@ -228,22 +233,12 @@ export default function ReportsPage() {
       </div>
 
       {/* Period Selector Tabs */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px' }}>
+      <div className="filter-tabs animate-fade-in">
         {(['current_month', 'last_3_months', 'last_6_months', 'year'] as PeriodOption[]).map(p => (
           <button
             key={p}
             onClick={() => setPeriod(p)}
-            style={{
-              padding: '6px 14px',
-              borderRadius: '8px',
-              border: 'none',
-              backgroundColor: period === p ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-              color: period === p ? '#818cf8' : '#a0a0b0',
-              fontSize: '13px',
-              fontWeight: period === p ? 600 : 400,
-              cursor: 'pointer',
-              transition: 'all 120ms',
-            }}
+            className={`filter-tab ${period === p ? 'filter-tab-active' : ''}`}
           >
             {PERIOD_LABELS[p]}
           </button>
@@ -251,78 +246,52 @@ export default function ReportsPage() {
       </div>
 
       {/* KPI Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '16px',
-      }}>
-        {/* Income */}
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-              Ingresos Totales
-            </p>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(34, 197, 94, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingUp size={14} color="#4ade80" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 stagger animate-slide-up">
+        <div className="stat-card stat-card-positive">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Ingresos Totales</p>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <TrendingUp size={14} color="#10b981" />
             </div>
           </div>
-          <p style={{ fontSize: '22px', fontWeight: 600, color: '#4ade80', margin: 0, letterSpacing: '-0.02em' }}>
+          <p className="gradient-text-green" style={{ fontSize: '22px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
             {formatCurrency(stats.totalIncome, currency)}
           </p>
         </div>
 
-        {/* Expenses */}
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-              Gastos Totales
-            </p>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <TrendingDown size={14} color="#f87171" />
+        <div className="stat-card stat-card-negative">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Gastos Totales</p>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <TrendingDown size={14} color="#ef4444" />
             </div>
           </div>
-          <p style={{ fontSize: '22px', fontWeight: 600, color: '#f87171', margin: 0, letterSpacing: '-0.02em' }}>
+          <p className="gradient-text-red" style={{ fontSize: '22px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
             {formatCurrency(stats.totalExpenses, currency)}
           </p>
         </div>
 
-        {/* Net Savings */}
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-              Balance Neto
-            </p>
-            <div style={{ width: '28px', height: '28px', borderRadius: '50%', backgroundColor: 'rgba(99, 102, 241, 0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <PiggyBank size={14} color="#818cf8" />
+        <div className={`stat-card ${stats.netSavings >= 0 ? 'stat-card-accent' : 'stat-card-negative'}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Balance Neto</p>
+            <div style={{ width: '28px', height: '28px', borderRadius: '8px', backgroundColor: 'rgba(124,58,237,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <PiggyBank size={14} color="#7c3aed" />
             </div>
           </div>
-          <p style={{
-            fontSize: '22px',
-            fontWeight: 600,
-            color: stats.netSavings >= 0 ? '#f2f2f8' : '#f87171',
-            margin: 0,
-            letterSpacing: '-0.02em',
-          }}>
+          <p className={stats.netSavings >= 0 ? 'gradient-text' : 'gradient-text-red'} style={{ fontSize: '22px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>
             {formatCurrency(stats.netSavings, currency)}
           </p>
         </div>
 
-        {/* Savings Rate */}
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-              Tasa de Ahorro
-            </p>
-            <span style={{ fontSize: '11.5px', color: '#a0a0b0' }}>
-              {stats.txCount} movs
-            </span>
+        <div className={`stat-card ${stats.savingsRate >= 20 ? 'stat-card-positive' : ''}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Tasa de Ahorro</p>
+            <span className="tag tag-accent" style={{ fontSize: '11px' }}>{stats.txCount} movs</span>
           </div>
           <p style={{
-            fontSize: '22px',
-            fontWeight: 600,
-            color: stats.savingsRate >= 20 ? '#4ade80' : stats.savingsRate > 0 ? '#818cf8' : '#646473',
-            margin: 0,
-            letterSpacing: '-0.02em',
+            fontSize: '28px', fontWeight: 800,
+            color: stats.savingsRate >= 20 ? '#34d399' : stats.savingsRate > 0 ? '#a78bfa' : '#55556a',
+            margin: 0, letterSpacing: '-0.03em',
           }}>
             {stats.savingsRate}%
           </p>
@@ -330,23 +299,20 @@ export default function ReportsPage() {
       </div>
 
       {/* Main Trend Chart */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div className="section-card animate-fade-in">
+        <div className="section-card-header">
           <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
+            <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
               Evolución de Ingresos vs Gastos
             </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
+            <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
               Comparativa temporal en {currency}
             </p>
           </div>
         </div>
-        <IncomeExpenseChart data={chartData} currency={currency} />
+        <div style={{ padding: '20px' }}>
+          <IncomeExpenseChart data={chartData} currency={currency} />
+        </div>
       </div>
 
       {/* Bottom Grid: Category Breakdown + Account Breakdown */}

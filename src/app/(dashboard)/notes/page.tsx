@@ -14,15 +14,7 @@ import type { NoteWithRelations } from '@/types'
 import type { NoteFormValues } from '@/lib/validations/note'
 
 export default function NotesPage() {
-  const {
-    notes,
-    isLoading,
-    createNote,
-    updateNote,
-    deleteNote,
-    togglePin,
-  } = useNotes()
-
+  const { notes, isLoading, createNote, updateNote, deleteNote, togglePin } = useNotes()
   const { projects } = useProjects()
 
   const [showModal, setShowModal] = useState(false)
@@ -33,20 +25,15 @@ export default function NotesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Filtered notes
   const filteredNotes = useMemo(() => {
     return notes.filter(n => {
-      // Project filter
       if (selectedProject !== 'all' && n.project_id !== selectedProject) return false
-
-      // Search
       if (search) {
         const query = search.toLowerCase()
         const matchTitle = n.title.toLowerCase().includes(query)
         const matchContent = (n.content || '').toLowerCase().includes(query)
         if (!matchTitle && !matchContent) return false
       }
-
       return true
     })
   }, [notes, selectedProject, search])
@@ -57,13 +44,8 @@ export default function NotesPage() {
   async function handleCreateOrUpdate(values: NoteFormValues) {
     setIsSubmitting(true)
     try {
-      if (editing) {
-        await updateNote(editing.id, values)
-        setEditing(null)
-      } else {
-        await createNote(values)
-        setShowModal(false)
-      }
+      if (editing) { await updateNote(editing.id, values); setEditing(null) }
+      else { await createNote(values); setShowModal(false) }
     } finally {
       setIsSubmitting(false)
     }
@@ -72,34 +54,29 @@ export default function NotesPage() {
   async function handleDelete() {
     if (!deleting) return
     setIsDeleting(true)
-    try {
-      await deleteNote(deleting.id)
-      setDeleting(null)
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  function handleEdit(note: NoteWithRelations) {
-    setEditing(note)
+    try { await deleteNote(deleting.id); setDeleting(null) }
+    finally { setIsDeleting(false) }
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
+      <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Notas e Ideas
-          </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '999px',
+            backgroundColor: 'rgba(244,114,182,0.12)', border: '1px solid rgba(244,114,182,0.25)',
+            marginBottom: '10px',
+          }}>
+            <FileText size={11} color="#f472b6" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#f472b6', letterSpacing: '0.04em' }}>Ideas & notas</span>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>Notas e Ideas</h1>
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
             {notes.length} nota{notes.length !== 1 ? 's' : ''} guardada{notes.length !== 1 ? 's' : ''}
+            {pinnedNotes.length > 0 && ` · ${pinnedNotes.length} fijada${pinnedNotes.length !== 1 ? 's' : ''}`}
           </p>
         </div>
         <Button leftIcon={<Plus size={15} color="white" />} onClick={() => { setEditing(null); setShowModal(true) }}>
@@ -107,60 +84,37 @@ export default function NotesPage() {
         </Button>
       </div>
 
-      {/* Filter & Search Bar */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '12px',
-      }}>
-        {/* Project Selector */}
-        {projects.length > 0 && (
-          <select
-            value={selectedProject}
-            onChange={(e) => setSelectedProject(e.target.value)}
-            style={{
-              height: '36px',
-              padding: '0 14px',
-              borderRadius: '8px',
-              backgroundColor: '#181820',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              color: '#a0a0b0',
-              fontSize: '13px',
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            <option value="all">Todos los proyectos</option>
-            {projects.map(p => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        )}
-
-        {/* Search */}
-        <div style={{ position: 'relative', width: '260px' }}>
+      {/* Search & Filter Bar */}
+      <div className="glass-card animate-fade-in" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 16px', flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: '200px' }}>
+          <Search size={14} color="#55556a" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
           <input
             type="text"
             placeholder="Buscar notas o ideas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
-              width: '100%',
-              height: '36px',
-              paddingLeft: '34px',
-              paddingRight: '12px',
-              borderRadius: '8px',
-              backgroundColor: '#181820',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              color: '#f2f2f8',
-              fontSize: '13px',
-              outline: 'none',
+              width: '100%', height: '36px', paddingLeft: '34px', paddingRight: '12px',
+              borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.04)',
+              border: '1px solid var(--border-medium)', color: '#eeeeff', fontSize: '13px', outline: 'none',
             }}
           />
-          <Search size={15} color="#646473" style={{ position: 'absolute', left: '11px', top: '10px' }} />
         </div>
+
+        {projects.length > 0 && (
+          <select
+            value={selectedProject}
+            onChange={(e) => setSelectedProject(e.target.value)}
+            style={{
+              height: '36px', padding: '0 14px', borderRadius: '8px',
+              backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid var(--border-medium)',
+              color: '#9898b8', fontSize: '13px', outline: 'none', cursor: 'pointer',
+            }}
+          >
+            <option value="all">Todos los proyectos</option>
+            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select>
+        )}
       </div>
 
       {/* Content */}
@@ -169,13 +123,7 @@ export default function NotesPage() {
           {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : filteredNotes.length === 0 ? (
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}>
+        <div className="glass-card" style={{ padding: '56px 24px', textAlign: 'center' }}>
           <EmptyState
             icon={FileText}
             title={search ? 'No se encontraron notas' : 'No tenés notas todavía'}
@@ -185,23 +133,21 @@ export default function NotesPage() {
           />
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
           {/* Pinned notes */}
           {pinnedNotes.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11.5px', fontWeight: 600, color: '#818cf8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                <Pin size={13} />
-                <span>Notas fijadas</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <Pin size={13} color="#f472b6" />
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#f472b6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Notas fijadas
+                </span>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                {pinnedNotes.map(note => (
-                  <NoteCard
-                    key={note.id}
-                    note={note}
-                    onEdit={handleEdit}
-                    onDelete={setDeleting}
-                    onTogglePin={togglePin}
-                  />
+              <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                {pinnedNotes.map((note, i) => (
+                  <div key={note.id} className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+                    <NoteCard note={note} onEdit={setEditing} onDelete={setDeleting} onTogglePin={togglePin} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -211,19 +157,15 @@ export default function NotesPage() {
           {unpinnedNotes.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {pinnedNotes.length > 0 && (
-                <p style={{ fontSize: '11.5px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                   Otras notas
-                </p>
+                </span>
               )}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-                {unpinnedNotes.map(note => (
-                  <NoteCard
-                    key={note.id}
-                    note={note}
-                    onEdit={handleEdit}
-                    onDelete={setDeleting}
-                    onTogglePin={togglePin}
-                  />
+              <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
+                {unpinnedNotes.map((note, i) => (
+                  <div key={note.id} className="animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+                    <NoteCard note={note} onEdit={setEditing} onDelete={setDeleting} onTogglePin={togglePin} />
+                  </div>
                 ))}
               </div>
             </div>
@@ -231,7 +173,6 @@ export default function NotesPage() {
         </div>
       )}
 
-      {/* Create / Edit Modal */}
       <NoteModal
         isOpen={showModal || !!editing}
         onClose={() => { setShowModal(false); setEditing(null) }}
@@ -239,16 +180,7 @@ export default function NotesPage() {
         initialData={editing}
         isLoading={isSubmitting}
       />
-
-      {/* Delete Confirm */}
-      <ConfirmDialog
-        isOpen={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        isLoading={isDeleting}
-        title="Eliminar nota"
-        description={`¿Querés eliminar la nota "${deleting?.title}"?`}
-      />
+      <ConfirmDialog isOpen={!!deleting} onClose={() => setDeleting(null)} onConfirm={handleDelete} isLoading={isDeleting} title="Eliminar nota" description={`¿Querés eliminar la nota "${deleting?.title}"?`} />
     </div>
   )
 }

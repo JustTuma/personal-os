@@ -13,7 +13,10 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { formatCurrency } from '@/lib/utils/currency'
-import { Building2, Plus, Wallet, Banknote, PiggyBank, TrendingUp, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import {
+  Building2, Plus, Wallet, Banknote, PiggyBank, TrendingUp,
+  MoreHorizontal, Pencil, Trash2
+} from 'lucide-react'
 import type { AccountWithBalance, AccountType } from '@/types'
 
 const ACCOUNT_TYPE_LABELS: Record<AccountType, string> = {
@@ -35,82 +38,90 @@ const ACCOUNT_TYPE_ICONS: Record<AccountType, React.ReactNode> = {
 }
 
 const PRESET_COLORS = [
-  '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
+  '#7c3aed', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 ]
 
 function AccountCard({
-  account,
-  onEdit,
-  onDelete,
+  account, onEdit, onDelete,
 }: {
   account: AccountWithBalance
   onEdit: (a: AccountWithBalance) => void
   onDelete: (a: AccountWithBalance) => void
 }) {
   const isNegative = account.current_balance < 0
+  const color = account.color || '#7c3aed'
 
   return (
-    <div style={{
-      backgroundColor: '#111117',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      borderRadius: '14px',
-      padding: '20px',
-      position: 'relative',
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      minHeight: '160px',
-      transition: 'border-color 150ms',
-    }}>
-      {/* Color accent line */}
+    <div
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        minHeight: '170px',
+        padding: '20px',
+        borderRadius: '16px',
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(20px)',
+        border: `1px solid ${color}30`,
+        transition: 'border-color 200ms, box-shadow 200ms, transform 200ms',
+        cursor: 'default',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = `${color}60`
+        e.currentTarget.style.boxShadow = `0 0 20px ${color}18, 0 8px 24px rgba(0,0,0,0.4)`
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = `${color}30`
+        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.transform = 'translateY(0)'
+      }}
+    >
+      {/* Top color glow */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '3px',
-        backgroundColor: account.color || '#6366f1',
+        position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+        background: `linear-gradient(90deg, ${color}, ${color}88)`,
+      }} />
+
+      {/* Ambient glow corner */}
+      <div style={{
+        position: 'absolute', top: -20, right: -20, width: '80px', height: '80px',
+        borderRadius: '50%', background: color, opacity: 0.07, filter: 'blur(20px)',
+        pointerEvents: 'none',
       }} />
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
         <div style={{
-          width: '38px',
-          height: '38px',
-          borderRadius: '10px',
-          backgroundColor: (account.color || '#6366f1') + '18',
-          color: account.color || '#6366f1',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          width: '40px', height: '40px', borderRadius: '11px',
+          backgroundColor: `${color}22`, color,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: `0 0 10px ${color}30`,
         }}>
           {ACCOUNT_TYPE_ICONS[account.type]}
         </div>
 
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: '2px' }}>
           <button
             onClick={() => onEdit(account)}
             style={{
-              padding: '6px',
-              borderRadius: '6px',
-              border: 'none',
-              background: 'transparent',
-              color: '#646473',
-              cursor: 'pointer',
+              padding: '6px', borderRadius: '7px', border: 'none',
+              background: 'transparent', color: '#55556a', cursor: 'pointer', transition: 'all 150ms',
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#c8c8e8' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#55556a' }}
           >
             <Pencil size={14} />
           </button>
           <button
             onClick={() => onDelete(account)}
             style={{
-              padding: '6px',
-              borderRadius: '6px',
-              border: 'none',
-              background: 'transparent',
-              color: '#646473',
-              cursor: 'pointer',
+              padding: '6px', borderRadius: '7px', border: 'none',
+              background: 'transparent', color: '#55556a', cursor: 'pointer', transition: 'all 150ms',
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#f87171' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#55556a' }}
           >
             <Trash2 size={14} />
           </button>
@@ -118,25 +129,25 @@ function AccountCard({
       </div>
 
       <div>
-        <p style={{ fontSize: '15px', fontWeight: 600, color: '#f2f2f8', margin: '0 0 2px' }}>
+        <p style={{ fontSize: '15px', fontWeight: 700, color: '#eeeeff', margin: '0 0 2px', letterSpacing: '-0.01em' }}>
           {account.name}
         </p>
-        <p style={{ fontSize: '12px', color: '#646473', margin: 0 }}>
+        <p style={{ fontSize: '12px', color: '#55556a', margin: 0 }}>
           {ACCOUNT_TYPE_LABELS[account.type]}
         </p>
       </div>
 
       <div style={{ marginTop: '12px' }}>
         <p style={{
-          fontSize: '22px',
-          fontWeight: 600,
-          letterSpacing: '-0.02em',
-          color: isNegative ? '#f87171' : '#f2f2f8',
-          margin: 0,
+          fontSize: '24px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0,
+          color: isNegative ? '#f87171' : '#eeeeff',
         }}>
           {formatCurrency(account.current_balance, account.currency)}
         </p>
-        <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', margin: '2px 0 0', textTransform: 'uppercase' }}>
+        <p style={{
+          fontSize: '10px', fontWeight: 700, color: color,
+          margin: '3px 0 0', textTransform: 'uppercase', letterSpacing: '0.08em',
+        }}>
           {account.currency}
         </p>
       </div>
@@ -153,14 +164,14 @@ function AccountForm({ defaultValues, onSubmit, onCancel, isLoading }: {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema) as never,
     defaultValues: {
-      color: '#6366f1',
+      color: '#7c3aed',
       currency: 'ARS',
       ...defaultValues,
       notes: defaultValues?.notes ?? undefined,
     },
   })
 
-  const selectedColor = watch('color') ?? '#6366f1'
+  const selectedColor = watch('color') ?? '#7c3aed'
 
   return (
     <form onSubmit={handleSubmit(onSubmit as never)} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -192,8 +203,8 @@ function AccountForm({ defaultValues, onSubmit, onCancel, isLoading }: {
       />
 
       {/* Color picker */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-        <label style={{ fontSize: '11px', fontWeight: 600, color: '#a0a0b0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <label style={{ fontSize: '11px', fontWeight: 600, color: '#9898b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Color
         </label>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -203,14 +214,12 @@ function AccountForm({ defaultValues, onSubmit, onCancel, isLoading }: {
               type="button"
               onClick={() => setValue('color', color)}
               style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
+                width: '28px', height: '28px', borderRadius: '50%',
                 backgroundColor: color,
-                border: selectedColor === color ? '2px solid white' : '2px solid transparent',
-                cursor: 'pointer',
-                transition: 'transform 120ms',
-                transform: selectedColor === color ? 'scale(1.15)' : 'scale(1)',
+                border: selectedColor === color ? `2px solid white` : '2px solid transparent',
+                cursor: 'pointer', transition: 'transform 150ms',
+                transform: selectedColor === color ? 'scale(1.2)' : 'scale(1)',
+                boxShadow: selectedColor === color ? `0 0 10px ${color}80` : 'none',
               }}
             />
           ))}
@@ -220,9 +229,7 @@ function AccountForm({ defaultValues, onSubmit, onCancel, isLoading }: {
       <Input label="Notas (opcional)" placeholder="Información adicional..." {...register('notes')} />
 
       <div style={{ display: 'flex', gap: '10px', paddingTop: '8px' }}>
-        <Button type="button" variant="ghost" onClick={onCancel} style={{ flex: 1 }}>
-          Cancelar
-        </Button>
+        <Button type="button" variant="ghost" onClick={onCancel} style={{ flex: 1 }}>Cancelar</Button>
         <Button type="submit" isLoading={isLoading} style={{ flex: 1 }}>
           {defaultValues ? 'Guardar cambios' : 'Crear cuenta'}
         </Button>
@@ -239,7 +246,6 @@ export default function AccountsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Group by currency
   const arsAccounts = accounts.filter(a => a.currency === 'ARS')
   const usdAccounts = accounts.filter(a => a.currency === 'USD')
   const totalARS = arsAccounts.reduce((s, a) => s + a.current_balance, 0)
@@ -266,20 +272,22 @@ export default function AccountsPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
-      }}>
+      <div className="animate-fade-in" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Cuentas
-          </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '999px',
+            backgroundColor: 'rgba(14,165,233,0.12)', border: '1px solid rgba(14,165,233,0.25)',
+            marginBottom: '10px',
+          }}>
+            <Building2 size={11} color="#0ea5e9" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#38bdf8', letterSpacing: '0.04em' }}>Billeteras</span>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>Cuentas</h1>
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
             {accounts.length} cuenta{accounts.length !== 1 ? 's' : ''} activa{accounts.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -290,29 +298,35 @@ export default function AccountsPage() {
 
       {/* Totals summary */}
       {accounts.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 stagger animate-slide-up">
           {arsAccounts.length > 0 && (
-            <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>
-                Total ARS
-              </p>
-              <p style={{ fontSize: '26px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
+            <div className="stat-card stat-card-accent">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Total ARS</p>
+                <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: 'rgba(124,58,237,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Wallet size={14} color="#7c3aed" />
+                </div>
+              </div>
+              <p className="gradient-text" style={{ fontSize: '28px', fontWeight: 800, margin: 0, letterSpacing: '-0.03em' }}>
                 {formatCurrency(totalARS, 'ARS')}
               </p>
-              <p style={{ fontSize: '12px', color: '#646473', margin: '4px 0 0' }}>
+              <p style={{ fontSize: '11.5px', color: '#55556a', margin: '8px 0 0' }}>
                 {arsAccounts.length} cuenta{arsAccounts.length !== 1 ? 's' : ''}
               </p>
             </div>
           )}
           {usdAccounts.length > 0 && (
-            <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-              <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>
-                Total USD
-              </p>
-              <p style={{ fontSize: '26px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
+            <div className="stat-card" style={{ borderColor: 'rgba(14,165,233,0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+                <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Total USD</p>
+                <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: 'rgba(14,165,233,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Wallet size={14} color="#0ea5e9" />
+                </div>
+              </div>
+              <p style={{ fontSize: '28px', fontWeight: 800, color: '#38bdf8', margin: 0, letterSpacing: '-0.03em' }}>
                 {formatCurrency(totalUSD, 'USD')}
               </p>
-              <p style={{ fontSize: '12px', color: '#646473', margin: '4px 0 0' }}>
+              <p style={{ fontSize: '11.5px', color: '#55556a', margin: '8px 0 0' }}>
                 {usdAccounts.length} cuenta{usdAccounts.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -326,13 +340,7 @@ export default function AccountsPage() {
           {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : accounts.length === 0 ? (
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}>
+        <div className="glass-card" style={{ padding: '56px 24px', textAlign: 'center' }}>
           <EmptyState
             icon={Building2}
             title="No tenés cuentas todavía"
@@ -342,24 +350,18 @@ export default function AccountsPage() {
           />
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          {accounts.map(account => (
-            <AccountCard
-              key={account.id}
-              account={account}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-            />
+        <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          {accounts.map((account, i) => (
+            <div key={account.id} className="animate-slide-up" style={{ animationDelay: `${i * 60}ms` }}>
+              <AccountCard account={account} onEdit={setEditing} onDelete={setDeleting} />
+            </div>
           ))}
         </div>
       )}
 
-      {/* Create modal */}
       <Modal isOpen={showCreate} onClose={() => setShowCreate(false)} title="Nueva cuenta">
         <AccountForm onSubmit={handleCreate} onCancel={() => setShowCreate(false)} isLoading={isSubmitting} />
       </Modal>
-
-      {/* Edit modal */}
       <Modal isOpen={!!editing} onClose={() => setEditing(null)} title="Editar cuenta">
         {editing && (
           <AccountForm
@@ -370,16 +372,7 @@ export default function AccountsPage() {
           />
         )}
       </Modal>
-
-      {/* Delete confirm */}
-      <ConfirmDialog
-        isOpen={!!deleting}
-        onClose={() => setDeleting(null)}
-        onConfirm={handleDelete}
-        isLoading={isDeleting}
-        title="Eliminar cuenta"
-        description={`¿Eliminás la cuenta "${deleting?.name}"? Los movimientos asociados no serán eliminados.`}
-      />
+      <ConfirmDialog isOpen={!!deleting} onClose={() => setDeleting(null)} onConfirm={handleDelete} isLoading={isDeleting} title="Eliminar cuenta" description={`¿Eliminás la cuenta "${deleting?.name}"? Los movimientos asociados no serán eliminados.`} />
     </div>
   )
 }

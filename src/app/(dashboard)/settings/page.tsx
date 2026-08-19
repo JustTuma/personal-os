@@ -182,53 +182,42 @@ export default function SettingsPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', maxWidth: '840px' }}>
       {/* Header */}
-      <div>
-        <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-          Configuración
+      <div className="animate-fade-in">
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: '6px',
+          padding: '4px 10px', borderRadius: '999px',
+          backgroundColor: 'rgba(167,139,250,0.12)', border: '1px solid rgba(167,139,250,0.25)',
+          marginBottom: '10px',
+        }}>
+          <Shield size={11} color="#a78bfa" />
+          <span style={{ fontSize: '11px', fontWeight: 600, color: '#a78bfa', letterSpacing: '0.04em' }}>Configuración</span>
+        </div>
+        <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>
+          Ajustes
         </h1>
-        <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+        <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
           Preferencias de usuario, categorías personalizadas y respaldo de datos
         </p>
       </div>
 
       {/* 1. Profile & Preferences */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(99, 102, 241, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <User size={16} color="#818cf8" />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-              Perfil y Moneda
-            </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
-              Tus datos de cuenta y moneda preferida
-            </p>
+      <div className="section-card animate-slide-up">
+        <div className="section-card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(124,58,237,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <User size={16} color="#a78bfa" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>Perfil y Moneda</h2>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>Tus datos de cuenta y moneda preferida</p>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-            <Input
-              label="Nombre completo"
-              placeholder="Tu nombre"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-            />
-            <Input
-              label="Correo electrónico"
-              value={email || ''}
-              disabled
-              hint="El email no puede modificarse directamente"
-            />
+            <Input label="Nombre completo" placeholder="Tu nombre" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+            <Input label="Correo electrónico" value={email || ''} disabled hint="El email no puede modificarse directamente" />
           </div>
 
           <div style={{ width: '50%' }}>
@@ -244,9 +233,7 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '4px' }}>
-            <Button type="submit" isLoading={isSavingProfile}>
-              Guardar perfil
-            </Button>
+            <Button type="submit" isLoading={isSavingProfile}>Guardar perfil</Button>
           </div>
         </form>
       </div>

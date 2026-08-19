@@ -9,7 +9,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { formatCurrency } from '@/lib/utils/currency'
 import { getCurrentMonthRange } from '@/lib/utils/date'
-import { Plus, ArrowRight, TrendingUp, TrendingDown } from 'lucide-react'
+import { Plus, ArrowRight, TrendingUp, TrendingDown, Wallet } from 'lucide-react'
 import type { TransactionFormValues, TransferFormValues } from '@/lib/validations/transaction'
 
 export default function FinancesPage() {
@@ -27,8 +27,8 @@ export default function FinancesPage() {
 
   const totalIncome  = transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const totalExpense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+  const balance = totalIncome - totalExpense
 
-  // Get primary currency (most used)
   const primaryCurrency = transactions.length > 0
     ? (transactions.filter(t => t.currency === 'ARS').length >= transactions.filter(t => t.currency === 'USD').length ? 'ARS' : 'USD')
     : 'ARS'
@@ -44,120 +44,88 @@ export default function FinancesPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '16px',
+      <div className="animate-fade-in" style={{
+        display: 'flex', alignItems: 'flex-start',
+        justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px',
       }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Finanzas
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            padding: '4px 10px', borderRadius: '999px',
+            backgroundColor: 'rgba(16,185,129,0.12)',
+            border: '1px solid rgba(16,185,129,0.25)', marginBottom: '10px',
+          }}>
+            <Wallet size={11} color="#10b981" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#34d399', letterSpacing: '0.04em' }}>
+              Finanzas
+            </span>
+          </div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.03em' }}>
+            Movimientos
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
-            Movimientos y transacciones del mes
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
+            Transacciones del mes actual
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<ArrowRight size={15} color="#818cf8" />}
-            onClick={() => setModal('transfer')}
-          >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Button variant="secondary" size="sm" leftIcon={<ArrowRight size={14} color="#818cf8" />} onClick={() => setModal('transfer')}>
             Transferir
           </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            leftIcon={<TrendingDown size={15} color="#f87171" />}
-            onClick={() => setModal('expense')}
-          >
+          <Button variant="secondary" size="sm" leftIcon={<TrendingDown size={14} color="#f87171" />} onClick={() => setModal('expense')}>
             Gasto
           </Button>
-          <Button
-            size="sm"
-            leftIcon={<Plus size={15} color="white" />}
-            onClick={() => setModal('income')}
-          >
+          <Button size="sm" leftIcon={<Plus size={14} color="white" />} onClick={() => setModal('income')}>
             Ingreso
           </Button>
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px',
-      }}>
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '20px',
-        }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
-            Ingresos del mes
-          </p>
-          <p style={{ fontSize: '24px', fontWeight: 600, color: '#4ade80', margin: 0, letterSpacing: '-0.02em' }}>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 stagger animate-slide-up">
+        <div className="stat-card stat-card-positive">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Ingresos del mes</p>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: 'rgba(16,185,129,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <TrendingUp size={15} color="#10b981" />
+            </div>
+          </div>
+          <p className="gradient-text-green" style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0 }}>
             +{formatCurrency(totalIncome, primaryCurrency)}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '20px',
-        }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
-            Gastos del mes
-          </p>
-          <p style={{ fontSize: '24px', fontWeight: 600, color: '#f87171', margin: 0, letterSpacing: '-0.02em' }}>
+
+        <div className="stat-card stat-card-negative">
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Gastos del mes</p>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <TrendingDown size={15} color="#ef4444" />
+            </div>
+          </div>
+          <p className="gradient-text-red" style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0 }}>
             -{formatCurrency(totalExpense, primaryCurrency)}
           </p>
         </div>
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '20px',
-        }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 10px' }}>
-            Balance del mes
-          </p>
-          <p style={{
-            fontSize: '24px',
-            fontWeight: 600,
-            color: totalIncome - totalExpense >= 0 ? '#f2f2f8' : '#f87171',
-            margin: 0,
-            letterSpacing: '-0.02em',
-          }}>
-            {formatCurrency(totalIncome - totalExpense, primaryCurrency)}
+
+        <div className={`stat-card ${balance >= 0 ? 'stat-card-accent' : 'stat-card-negative'}`}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Balance del mes</p>
+            <div style={{ width: '30px', height: '30px', borderRadius: '8px', backgroundColor: balance >= 0 ? 'rgba(124,58,237,0.15)' : 'rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Wallet size={15} color={balance >= 0 ? '#7c3aed' : '#ef4444'} />
+            </div>
+          </div>
+          <p className={balance >= 0 ? 'gradient-text' : 'gradient-text-red'} style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0 }}>
+            {formatCurrency(balance, primaryCurrency)}
           </p>
         </div>
       </div>
 
       {/* Transaction list */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        overflow: 'hidden',
-      }}>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '14px 20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        }}>
-          <h2 style={{ fontSize: '13.5px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-            Movimientos
-          </h2>
+      <div className="section-card animate-fade-in">
+        <div className="section-card-header">
+          <h2 style={{ fontSize: '13.5px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>Movimientos</h2>
           <Button variant="ghost" size="sm" leftIcon={<Plus size={14} />} onClick={() => setModal('expense')}>
             Agregar
           </Button>
@@ -171,19 +139,9 @@ export default function FinancesPage() {
         />
       </div>
 
-      {/* Modals */}
-      <Modal
-        isOpen={modal === 'income' || modal === 'expense'}
-        onClose={() => setModal(null)}
-        title={modal === 'income' ? 'Registrar ingreso' : 'Registrar gasto'}
-      >
-        <TransactionForm
-          defaultType={modal === 'income' ? 'income' : 'expense'}
-          onSubmit={handleCreateTransaction}
-          onCancel={() => setModal(null)}
-        />
+      <Modal isOpen={modal === 'income' || modal === 'expense'} onClose={() => setModal(null)} title={modal === 'income' ? 'Registrar ingreso' : 'Registrar gasto'}>
+        <TransactionForm defaultType={modal === 'income' ? 'income' : 'expense'} onSubmit={handleCreateTransaction} onCancel={() => setModal(null)} />
       </Modal>
-
       <Modal isOpen={modal === 'transfer'} onClose={() => setModal(null)} title="Transferencia entre cuentas">
         <TransferForm onSubmit={handleCreateTransfer} onCancel={() => setModal(null)} />
       </Modal>
