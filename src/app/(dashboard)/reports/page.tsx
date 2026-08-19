@@ -316,91 +316,85 @@ export default function ReportsPage() {
       </div>
 
       {/* Bottom Grid: Category Breakdown + Account Breakdown */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap: '20px',
+      }}>
         {/* Category Breakdown */}
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}>
-          <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-              Gastos por Categoría
-            </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
-              Distribución de egresos en el período
-            </p>
+        <div className="section-card animate-slide-up">
+          <div className="section-card-header">
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                Gastos por Categoría
+              </h2>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
+                Distribución de egresos en el período
+              </p>
+            </div>
           </div>
 
-          <CategoryPieChart data={categoryBreakdown} currency={currency} />
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <CategoryPieChart data={categoryBreakdown} currency={currency} />
 
-          {/* Categories List */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '8px' }}>
-            {categoryBreakdown.length === 0 ? (
-              <p style={{ fontSize: '13px', color: '#646473', textAlign: 'center', padding: '16px 0' }}>
-                No hay gastos registrados en este período.
-              </p>
-            ) : (
-              categoryBreakdown.map((cat, idx) => (
-                <div
-                  key={cat.name + idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '8px 12px',
-                    backgroundColor: '#181820',
-                    borderRadius: '8px',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: cat.color }} />
-                    <span style={{ fontSize: '13px', fontWeight: 500, color: '#f2f2f8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {cat.name}
-                    </span>
-                  </div>
+            {/* Categories List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {categoryBreakdown.length === 0 ? (
+                <p style={{ fontSize: '13px', color: '#55556a', textAlign: 'center', padding: '16px 0' }}>
+                  No hay gastos registrados en este período.
+                </p>
+              ) : (
+                categoryBreakdown.map((cat, idx) => (
+                  <div
+                    key={cat.name + idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 14px',
+                      backgroundColor: 'rgba(255,255,255,0.03)',
+                      borderRadius: '10px',
+                      border: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+                      <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: cat.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: '#eeeeff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {cat.name}
+                      </span>
+                    </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#f2f2f8' }}>
-                      {formatCurrency(cat.amount, currency)}
-                    </span>
-                    <span style={{ fontSize: '12px', color: '#818cf8', fontWeight: 600, width: '36px', textAlign: 'right' }}>
-                      {cat.percentage}%
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: '#eeeeff' }}>
+                        {formatCurrency(cat.amount, currency)}
+                      </span>
+                      <span style={{ fontSize: '11.5px', color: '#a78bfa', fontWeight: 600, width: '36px', textAlign: 'right' }}>
+                        {cat.percentage}%
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))
-            )}
+                ))
+              )}
+            </div>
           </div>
         </div>
 
         {/* Account / Payment Method Breakdown */}
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-        }}>
-          <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-              Gastos por Cuenta
-            </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
-              Medios de pago utilizados en {currency}
-            </p>
+        <div className="section-card animate-slide-up">
+          <div className="section-card-header">
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                Gastos por Cuenta
+              </h2>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
+                Medios de pago utilizados en {currency}
+              </p>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+          <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {accountBreakdown.length === 0 ? (
-              <p style={{ fontSize: '13px', color: '#646473', textAlign: 'center', padding: '16px 0' }}>
+              <p style={{ fontSize: '13px', color: '#55556a', textAlign: 'center', padding: '16px 0' }}>
                 No hay movimientos de egreso en este período.
               </p>
             ) : (
@@ -410,33 +404,33 @@ export default function ReportsPage() {
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '6px',
+                    gap: '8px',
                     padding: '12px 14px',
-                    backgroundColor: '#181820',
+                    backgroundColor: 'rgba(255,255,255,0.03)',
                     borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255,255,255,0.05)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: acc.color }} />
-                      <span style={{ fontSize: '13.5px', fontWeight: 500, color: '#f2f2f8' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: acc.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '13px', fontWeight: 500, color: '#eeeeff' }}>
                         {acc.name}
                       </span>
                     </div>
-                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#f2f2f8' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#eeeeff' }}>
                       {formatCurrency(acc.amount, currency)}
                     </span>
                   </div>
 
                   {/* Progress bar */}
-                  <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255, 255, 255, 0.06)', borderRadius: '999px', overflow: 'hidden' }}>
+                  <div className="progress-track" style={{ height: '5px' }}>
                     <div style={{ width: `${acc.percentage}%`, height: '100%', backgroundColor: acc.color, borderRadius: '999px' }} />
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11.5px', color: '#646473' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#55556a' }}>
                     <span>{acc.count} gasto{acc.count !== 1 ? 's' : ''}</span>
-                    <span>{acc.percentage}% del total</span>
+                    <span style={{ color: '#a78bfa', fontWeight: 600 }}>{acc.percentage}% del total</span>
                   </div>
                 </div>
               ))

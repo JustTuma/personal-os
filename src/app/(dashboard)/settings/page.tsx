@@ -239,25 +239,17 @@ export default function SettingsPage() {
       </div>
 
       {/* 2. Categories Management */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+      <div className="section-card animate-slide-up">
+        <div className="section-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(34, 197, 94, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Tag size={16} color="#4ade80" />
             </div>
             <div>
-              <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
                 Categorías de Finanzas
               </h2>
-              <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
                 {allCategories.length} categorías disponibles para tus movimientos
               </p>
             </div>
@@ -268,7 +260,7 @@ export default function SettingsPage() {
           </Button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
+        <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
           {allCategories.map(cat => (
             <div
               key={cat.id}
@@ -277,14 +269,14 @@ export default function SettingsPage() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '10px 14px',
-                backgroundColor: '#181820',
+                backgroundColor: 'rgba(255,255,255,0.03)',
                 borderRadius: '10px',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: cat.color || '#6366f1', flexShrink: 0 }} />
-                <span style={{ fontSize: '13px', fontWeight: 500, color: '#f2f2f8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: cat.color || '#6366f1', flexShrink: 0 }} />
+                <span style={{ fontSize: '13px', fontWeight: 500, color: '#eeeeff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {cat.name}
                 </span>
               </div>
@@ -301,9 +293,12 @@ export default function SettingsPage() {
                       borderRadius: '4px',
                       border: 'none',
                       backgroundColor: 'transparent',
-                      color: '#646473',
+                      color: '#55556a',
                       cursor: 'pointer',
+                      transition: 'all 150ms',
                     }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#f87171' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#55556a' }}
                     title="Eliminar categoría personalizada"
                   >
                     <Trash2 size={13} />
@@ -316,30 +311,24 @@ export default function SettingsPage() {
       </div>
 
       {/* 3. Data Export / Backup */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '16px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Download size={16} color="#fbbf24" />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-              Exportación y Respaldo de Datos
-            </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
-              Descargá una copia completa de tus registros en cualquier momento
-            </p>
+      <div className="section-card animate-slide-up">
+        <div className="section-card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(245, 158, 11, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Download size={16} color="#fbbf24" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                Exportación y Respaldo de Datos
+              </h2>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
+                Descargá una copia completa de tus registros en cualquier momento
+              </p>
+            </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', paddingTop: '4px' }}>
+        <div style={{ padding: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           <Button variant="secondary" onClick={exportJSON}>
             Exportar todo en JSON
           </Button>
@@ -350,30 +339,24 @@ export default function SettingsPage() {
       </div>
 
       {/* 4. Security / Password */}
-      <div style={{
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        borderRadius: '14px',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Lock size={16} color="#f87171" />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-              Seguridad
-            </h2>
-            <p style={{ fontSize: '12.5px', color: '#646473', margin: '2px 0 0' }}>
-              Actualizar tu contraseña de acceso
-            </p>
+      <div className="section-card animate-slide-up">
+        <div className="section-card-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Lock size={16} color="#f87171" />
+            </div>
+            <div>
+              <h2 style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                Seguridad
+              </h2>
+              <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
+                Actualizar tu contraseña de acceso
+              </p>
+            </div>
           </div>
         </div>
 
-        <form onSubmit={handleSavePassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form onSubmit={handleSavePassword} style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
             <Input
               label="Nueva contraseña"

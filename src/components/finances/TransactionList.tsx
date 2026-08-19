@@ -7,7 +7,6 @@ import { formatDateRelative } from '@/lib/utils/date'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonRow } from '@/components/ui/Skeleton'
-import { Badge } from '@/components/ui/Badge'
 import { TrendingUp, TrendingDown, ArrowRight, Trash2, Receipt } from 'lucide-react'
 
 type ActivityItem =
@@ -32,7 +31,6 @@ export function TransactionList({
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'transaction' | 'transfer' } | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Merge and sort by date desc
   const items: ActivityItem[] = [
     ...transactions.map(t => ({ ...t, itemType: 'transaction' as const })),
     ...transfers.map(t => ({ ...t, itemType: 'transfer' as const })),
@@ -46,11 +44,8 @@ export function TransactionList({
     if (!deleteTarget) return
     setIsDeleting(true)
     try {
-      if (deleteTarget.type === 'transaction') {
-        await onDeleteTransaction(deleteTarget.id)
-      } else {
-        await onDeleteTransfer(deleteTarget.id)
-      }
+      if (deleteTarget.type === 'transaction') await onDeleteTransaction(deleteTarget.id)
+      else await onDeleteTransfer(deleteTarget.id)
       setDeleteTarget(null)
     } finally {
       setIsDeleting(false)
@@ -59,7 +54,7 @@ export function TransactionList({
 
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', padding: '8px 20px', gap: '2px' }}>
         {Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)}
       </div>
     )
@@ -81,8 +76,15 @@ export function TransactionList({
     <>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {items.map((item, idx) => {
+          const isLast = idx === items.length - 1
+
           if (item.itemType === 'transaction') {
             const isIncome = item.type === 'income'
+            const iconBg = isIncome ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)'
+            const iconColor = isIncome ? '#10b981' : '#ef4444'
+            const amountColor = isIncome ? '#34d399' : '#f87171'
+            const amountPrefix = isIncome ? '+' : '-'
+
             return (
               <div
                 key={item.id}
@@ -90,45 +92,52 @@ export function TransactionList({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '14px',
-                  padding: '14px 20px',
-                  borderBottom: idx !== items.length - 1 ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
-                  transition: 'background 120ms',
+                  padding: '13px 20px',
+                  borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                  transition: 'background 150ms',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
               >
                 {/* Icon */}
                 <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  backgroundColor: isIncome ? 'rgba(34, 197, 94, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                  width: '36px', height: '36px', borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, backgroundColor: iconBg,
                 }}>
                   {isIncome
-                    ? <TrendingUp size={16} color="#4ade80" />
-                    : <TrendingDown size={16} color="#f87171" />
+                    ? <TrendingUp size={15} color={iconColor} />
+                    : <TrendingDown size={15} color={iconColor} />
                   }
                 </div>
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#f2f2f8', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#eeeeff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {item.description}
                   </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
-                    <span style={{ fontSize: '12px', color: '#646473' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '11.5px', color: '#55556a' }}>
                       {formatDateRelative(item.date)}
                     </span>
-                    {item.account && <span style={{ fontSize: '12px', color: '#646473' }}>·</span>}
                     {item.account && (
-                      <span style={{ fontSize: '12px', color: '#a0a0b0' }}>{item.account.name}</span>
+                      <>
+                        <span style={{ fontSize: '11px', color: '#383848' }}>·</span>
+                        <span style={{ fontSize: '11.5px', color: '#7070a0' }}>{item.account.name}</span>
+                      </>
                     )}
                     {item.category && (
                       <>
-                        <span style={{ fontSize: '12px', color: '#646473' }}>·</span>
-                        <Badge variant="default">{item.category.name}</Badge>
+                        <span style={{ fontSize: '11px', color: '#383848' }}>·</span>
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center',
+                          fontSize: '11px', fontWeight: 500,
+                          color: item.category.color || '#7070a0',
+                          background: `${item.category.color || '#7070a0'}15`,
+                          padding: '1px 6px', borderRadius: '4px',
+                        }}>
+                          {item.category.name}
+                        </span>
                       </>
                     )}
                   </div>
@@ -136,41 +145,25 @@ export function TransactionList({
 
                 {/* Amount */}
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <span style={{
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    color: isIncome ? '#4ade80' : '#f87171',
-                  }}>
-                    {isIncome ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: amountColor, letterSpacing: '-0.01em' }}>
+                    {amountPrefix}{formatCurrency(item.amount, item.currency)}
                   </span>
                 </div>
 
-                {/* Delete action */}
+                {/* Delete */}
                 <button
                   onClick={() => setDeleteTarget({ id: item.id, type: 'transaction' })}
                   style={{
-                    padding: '6px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    backgroundColor: 'transparent',
-                    color: '#646473',
-                    cursor: 'pointer',
-                    marginLeft: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
+                    padding: '5px', borderRadius: '6px', border: 'none',
+                    background: 'transparent', color: '#383848', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 150ms',
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'
-                    e.currentTarget.style.color = '#f87171'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent'
-                    e.currentTarget.style.color = '#646473'
-                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#f87171' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#383848' }}
                   aria-label="Eliminar"
                 >
-                  <Trash2 size={15} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             )
@@ -184,65 +177,51 @@ export function TransactionList({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '14px',
-                padding: '14px 20px',
-                borderBottom: idx !== items.length - 1 ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
-                transition: 'background 120ms',
+                padding: '13px 20px',
+                borderBottom: isLast ? 'none' : '1px solid rgba(255,255,255,0.05)',
+                transition: 'background 150ms',
               }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.02)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
             >
               <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(99, 102, 241, 0.12)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
+                width: '36px', height: '36px', borderRadius: '10px',
+                backgroundColor: 'rgba(124,58,237,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
-                <ArrowRight size={16} color="#818cf8" />
+                <ArrowRight size={15} color="#a78bfa" />
               </div>
+
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#f2f2f8', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#eeeeff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.description ?? 'Transferencia'}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' }}>
-                  <span style={{ fontSize: '12px', color: '#646473' }}>{formatDateRelative(item.date)}</span>
-                  <span style={{ fontSize: '12px', color: '#646473' }}>·</span>
-                  <span style={{ fontSize: '12px', color: '#a0a0b0' }}>
+                  <span style={{ fontSize: '11.5px', color: '#55556a' }}>{formatDateRelative(item.date)}</span>
+                  <span style={{ fontSize: '11px', color: '#383848' }}>·</span>
+                  <span style={{ fontSize: '11.5px', color: '#7070a0' }}>
                     {item.from_account?.name} → {item.to_account?.name}
                   </span>
                 </div>
               </div>
-              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#818cf8' }}>
-                  {formatCurrency(item.amount, item.currency)}
-                </span>
-              </div>
+
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#a78bfa', letterSpacing: '-0.01em', flexShrink: 0 }}>
+                {formatCurrency(item.amount, item.currency)}
+              </span>
+
               <button
                 onClick={() => setDeleteTarget({ id: item.id, type: 'transfer' })}
                 style={{
-                  padding: '6px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  backgroundColor: 'transparent',
-                  color: '#646473',
-                  cursor: 'pointer',
-                  marginLeft: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  padding: '5px', borderRadius: '6px', border: 'none',
+                  background: 'transparent', color: '#383848', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 150ms',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'
-                  e.currentTarget.style.color = '#f87171'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent'
-                  e.currentTarget.style.color = '#646473'
-                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#f87171' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#383848' }}
                 aria-label="Eliminar"
               >
-                <Trash2 size={15} />
+                <Trash2 size={14} />
               </button>
             </div>
           )

@@ -31,144 +31,138 @@ const PRIORITY_CONFIG: Record<Priority, { label: string; variant: 'default' | 'p
 
 export function ProjectCard({ project, onEdit, onDelete, onSelect }: ProjectCardProps) {
   const isCompleted = project.status === 'completed' || (project.totalTasks > 0 && project.completionRate === 100)
+  const accent = isCompleted ? '#22c55e' : project.color || '#7c3aed'
 
-  let daysLeftText = null
+  let daysLeft = null
+  let daysUrgent = false
   if (project.target_date) {
     const days = differenceInDays(parseISO(project.target_date), new Date())
-    if (days < 0) daysLeftText = 'Fecha meta superada'
-    else if (days === 0) daysLeftText = 'Entrega hoy'
-    else daysLeftText = `Faltan ${days} días (${project.target_date})`
+    daysUrgent = days >= 0 && days <= 5 && !isCompleted
+    if (days < 0) daysLeft = 'Fecha superada'
+    else if (days === 0) daysLeft = 'Entrega hoy'
+    else daysLeft = `${days}d`
   }
 
   return (
-    <div style={{
-      backgroundColor: '#111117',
-      border: `1px solid ${isCompleted ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255, 255, 255, 0.08)'}`,
-      borderRadius: '14px',
-      padding: '20px',
-      position: 'relative',
-      overflow: 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      gap: '16px',
-      transition: 'all 150ms',
-    }}>
-      {/* Top color line */}
+    <div
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '14px',
+        padding: '20px',
+        borderRadius: '16px',
+        background: 'var(--bg-card)',
+        backdropFilter: 'blur(20px)',
+        border: `1px solid ${accent}22`,
+        transition: 'border-color 200ms, box-shadow 200ms, transform 200ms',
+        cursor: onSelect ? 'pointer' : 'default',
+      }}
+      onClick={() => onSelect?.(project)}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = `${accent}45`
+        e.currentTarget.style.boxShadow = `0 0 22px ${accent}15, 0 8px 24px rgba(0,0,0,0.4)`
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = `${accent}22`
+        e.currentTarget.style.boxShadow = 'none'
+        e.currentTarget.style.transform = 'translateY(0)'
+      }}
+    >
+      {/* Top gradient bar */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '3px',
-        backgroundColor: isCompleted ? '#22c55e' : project.color || '#6366f1',
+        position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+        background: isCompleted
+          ? 'linear-gradient(90deg, #22c55e, #4ade80)'
+          : `linear-gradient(90deg, ${accent}, ${accent}88)`,
+      }} />
+
+      {/* Ambient glow */}
+      <div style={{
+        position: 'absolute', top: -20, right: -20, width: '80px', height: '80px',
+        borderRadius: '50%', background: accent, opacity: 0.06, filter: 'blur(20px)',
+        pointerEvents: 'none',
       }} />
 
       {/* Header */}
-      <div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-                {project.name}
-              </h3>
-              {isCompleted && <CheckCircle2 size={16} color="#4ade80" />}
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
-              <Badge variant={STATUS_CONFIG[project.status]?.variant || 'default'}>
-                {STATUS_CONFIG[project.status]?.label || project.status}
-              </Badge>
-              <Badge variant={PRIORITY_CONFIG[project.priority]?.variant || 'default'}>
-                {PRIORITY_CONFIG[project.priority]?.label || project.priority}
-              </Badge>
-            </div>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '7px' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#eeeeff', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {project.name}
+            </h3>
+            {isCompleted && <CheckCircle2 size={15} color="#4ade80" />}
           </div>
-
-          <div style={{ display: 'flex', gap: '4px' }}>
-            <button
-              onClick={() => onEdit(project)}
-              style={{
-                padding: '6px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: '#646473',
-                cursor: 'pointer',
-              }}
-              title="Editar"
-            >
-              <Pencil size={14} />
-            </button>
-            <button
-              onClick={() => onDelete(project)}
-              style={{
-                padding: '6px',
-                borderRadius: '6px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                color: '#646473',
-                cursor: 'pointer',
-              }}
-              title="Eliminar"
-            >
-              <Trash2 size={14} />
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+            <Badge variant={STATUS_CONFIG[project.status]?.variant || 'default'}>
+              {STATUS_CONFIG[project.status]?.label || project.status}
+            </Badge>
+            <Badge variant={PRIORITY_CONFIG[project.priority]?.variant || 'default'}>
+              {PRIORITY_CONFIG[project.priority]?.label || project.priority}
+            </Badge>
+            {daysLeft && (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '3px',
+                fontSize: '11px', fontWeight: 600,
+                color: daysUrgent ? '#fbbf24' : '#55556a',
+              }}>
+                <Calendar size={10} />
+                {daysLeft}
+              </span>
+            )}
           </div>
+          {project.description && (
+            <p style={{ fontSize: '12px', color: '#7070a0', margin: '8px 0 0', lineHeight: 1.4 }}>
+              {project.description}
+            </p>
+          )}
         </div>
 
-        {project.description && (
-          <p style={{ fontSize: '12.5px', color: '#a0a0b0', margin: '10px 0 0', lineHeight: 1.4 }}>
-            {project.description}
-          </p>
-        )}
+        <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
+          {[{ icon: <Pencil size={13} />, action: (e: React.MouseEvent) => { e.stopPropagation(); onEdit(project) } },
+            { icon: <Trash2 size={13} />, action: (e: React.MouseEvent) => { e.stopPropagation(); onDelete(project) }, danger: true }
+          ].map((btn, i) => (
+            <button
+              key={i}
+              onClick={btn.action}
+              style={{ padding: '6px', borderRadius: '7px', border: 'none', background: 'transparent', color: '#55556a', cursor: 'pointer', transition: 'all 150ms' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = btn.danger ? 'rgba(239,68,68,0.1)' : 'rgba(255,255,255,0.07)'
+                e.currentTarget.style.color = btn.danger ? '#f87171' : '#c8c8e8'
+              }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#55556a' }}
+            >
+              {btn.icon}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Progress & Task Counts */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-          <span style={{ color: '#a0a0b0', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <CheckSquare size={13} color="#818cf8" />
-            {project.completedTasks} de {project.totalTasks} tareas completadas
+      {/* Progress */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '12px', color: '#7070a0' }}>
+            <CheckSquare size={12} color={accent} />
+            {project.completedTasks} / {project.totalTasks} tareas
           </span>
-          <span style={{ fontWeight: 600, color: project.color || '#818cf8' }}>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: accent }}>
             {project.completionRate}%
           </span>
         </div>
 
-        {/* Progress bar */}
-        <div style={{
-          width: '100%',
-          height: '6px',
-          borderRadius: '999px',
-          backgroundColor: 'rgba(255, 255, 255, 0.07)',
-          overflow: 'hidden',
-        }}>
+        <div className="progress-track">
           <div style={{
-            width: `${project.completionRate}%`,
-            height: '100%',
-            borderRadius: '999px',
-            backgroundColor: isCompleted ? '#22c55e' : project.color || '#6366f1',
-            transition: 'width 400ms ease-out',
+            width: `${project.completionRate}%`, height: '100%', borderRadius: '999px',
+            background: isCompleted
+              ? 'linear-gradient(90deg, #22c55e, #4ade80)'
+              : `linear-gradient(90deg, ${accent}, ${accent}cc)`,
+            transition: 'width 500ms cubic-bezier(0.4,0,0.2,1)',
+            boxShadow: `0 0 6px ${accent}40`,
           }} />
         </div>
       </div>
-
-      {/* Footer / Due Date */}
-      {daysLeftText && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          fontSize: '12px',
-          color: '#a0a0b0',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-          paddingTop: '10px',
-        }}>
-          <Calendar size={13} color="#646473" />
-          <span>{daysLeftText}</span>
-        </div>
-      )}
     </div>
   )
 }

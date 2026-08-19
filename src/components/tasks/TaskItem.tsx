@@ -12,6 +12,13 @@ interface TaskItemProps {
   onDelete: (task: TaskWithRelations) => void
 }
 
+const PRIORITY_COLORS: Record<Priority, { dot: string; bg: string }> = {
+  urgent: { dot: '#ef4444', bg: 'rgba(239,68,68,0.1)' },
+  high:   { dot: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
+  medium: { dot: '#60a5fa', bg: 'rgba(96,165,250,0.08)' },
+  low:    { dot: '#55556a', bg: 'rgba(255,255,255,0.04)' },
+}
+
 const PRIORITY_CONFIG: Record<Priority, { label: string; variant: 'default' | 'positive' | 'warning' | 'negative' | 'info' }> = {
   urgent: { label: 'Urgente', variant: 'negative' },
   high:   { label: 'Alta',    variant: 'warning' },
@@ -21,6 +28,7 @@ const PRIORITY_CONFIG: Record<Priority, { label: string; variant: 'default' | 'p
 
 export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
   const isCompleted = task.status === 'completed'
+  const priorityStyle = PRIORITY_COLORS[task.priority] || PRIORITY_COLORS.medium
 
   let daysUntil = null
   let isOverdue = false
@@ -39,15 +47,29 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        padding: '12px 18px',
-        backgroundColor: '#111117',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
+        padding: '11px 16px',
+        background: isCompleted ? 'rgba(255,255,255,0.02)' : 'var(--bg-card)',
+        backdropFilter: 'blur(20px)',
+        border: `1px solid ${isCompleted ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.07)'}`,
+        borderLeft: isCompleted ? '1px solid rgba(255,255,255,0.04)' : `3px solid ${priorityStyle.dot}`,
         borderRadius: '12px',
-        transition: 'all 120ms',
-        opacity: isCompleted ? 0.55 : 1,
+        transition: 'all 150ms',
+        opacity: isCompleted ? 0.5 : 1,
+      }}
+      onMouseEnter={e => {
+        if (!isCompleted) {
+          e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+          e.currentTarget.style.borderLeftColor = priorityStyle.dot
+        }
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = isCompleted ? 'rgba(255,255,255,0.02)' : 'var(--bg-card)'
+        e.currentTarget.style.borderColor = isCompleted ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.07)'
+        if (!isCompleted) e.currentTarget.style.borderLeftColor = priorityStyle.dot
       }}
     >
-      {/* Custom Checkbox */}
+      {/* Checkbox */}
       <button
         type="button"
         onClick={() => onToggle(task)}
@@ -55,25 +77,38 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
           width: '20px',
           height: '20px',
           borderRadius: '6px',
-          border: isCompleted ? '1px solid #22c55e' : '1px solid rgba(255, 255, 255, 0.25)',
+          border: isCompleted ? 'none' : `1.5px solid rgba(255,255,255,0.2)`,
           backgroundColor: isCompleted ? '#22c55e' : 'transparent',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           flexShrink: 0,
-          transition: 'all 120ms',
+          transition: 'all 180ms',
+          boxShadow: isCompleted ? '0 0 8px rgba(34,197,94,0.4)' : 'none',
+        }}
+        onMouseEnter={e => {
+          if (!isCompleted) {
+            e.currentTarget.style.borderColor = '#34d399'
+            e.currentTarget.style.background = 'rgba(52,211,153,0.1)'
+          }
+        }}
+        onMouseLeave={e => {
+          if (!isCompleted) {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'
+            e.currentTarget.style.background = 'transparent'
+          }
         }}
       >
-        {isCompleted && <Check size={13} color="white" strokeWidth={3} />}
+        {isCompleted && <Check size={12} color="white" strokeWidth={3} />}
       </button>
 
       {/* Main Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          fontSize: '14px',
-          fontWeight: 500,
-          color: isCompleted ? '#707082' : '#f2f2f8',
+          fontSize: '13.5px',
+          fontWeight: isCompleted ? 400 : 500,
+          color: isCompleted ? '#55556a' : '#eeeeff',
           textDecoration: isCompleted ? 'line-through' : 'none',
           margin: 0,
           overflow: 'hidden',
@@ -83,84 +118,63 @@ export function TaskItem({ task, onToggle, onEdit, onDelete }: TaskItemProps) {
           {task.title}
         </p>
 
-        {task.description && !isCompleted && (
-          <p style={{ fontSize: '12px', color: '#646473', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {task.description}
-          </p>
-        )}
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
-          <Badge variant={PRIORITY_CONFIG[task.priority]?.variant || 'default'} size="sm">
-            {PRIORITY_CONFIG[task.priority]?.label || task.priority}
-          </Badge>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginTop: '4px', flexWrap: 'wrap' }}>
+          {!isCompleted && (
+            <Badge variant={PRIORITY_CONFIG[task.priority]?.variant || 'default'} size="sm">
+              {PRIORITY_CONFIG[task.priority]?.label || task.priority}
+            </Badge>
+          )}
 
           {task.project && (
             <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              fontSize: '11px',
-              color: task.project.color || '#a0a0b0',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
-              padding: '2px 6px',
-              borderRadius: '4px',
+              display: 'inline-flex', alignItems: 'center', gap: '3px',
+              fontSize: '11px', color: task.project.color || '#7070a0',
+              background: 'rgba(255,255,255,0.04)',
+              padding: '2px 6px', borderRadius: '5px',
             }}>
-              <Folder size={11} />
+              <Folder size={10} />
               {task.project.name}
             </span>
           )}
 
           {task.due_date && (
             <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px',
-              fontSize: '11.5px',
-              color: isOverdue ? '#f87171' : isDueSoon ? '#fbbf24' : '#646473',
-              fontWeight: isOverdue || isDueSoon ? 600 : 400,
+              display: 'inline-flex', alignItems: 'center', gap: '3px',
+              fontSize: '11px', fontWeight: isOverdue || isDueSoon ? 600 : 400,
+              color: isOverdue ? '#f87171' : isDueSoon ? '#fbbf24' : '#55556a',
             }}>
-              <Calendar size={11} />
+              <Calendar size={10} />
               {isOverdue
-                ? `Venció el ${task.due_date}`
+                ? `Venció ${task.due_date}`
                 : daysUntil === 0
-                ? 'Vence hoy'
+                ? 'Hoy'
                 : daysUntil === 1
-                ? 'Vence mañana'
+                ? 'Mañana'
                 : task.due_date}
             </span>
           )}
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
+      {/* Action buttons (visible on hover via group) */}
+      <div style={{ display: 'flex', gap: '2px', flexShrink: 0 }}>
         <button
           onClick={() => onEdit(task)}
-          style={{
-            padding: '6px',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: '#646473',
-            cursor: 'pointer',
-          }}
           title="Editar"
+          style={{ padding: '5px', borderRadius: '6px', border: 'none', background: 'transparent', color: '#55556a', cursor: 'pointer', transition: 'all 150ms' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; e.currentTarget.style.color = '#c8c8e8' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#55556a' }}
         >
-          <Pencil size={14} />
+          <Pencil size={13} />
         </button>
         <button
           onClick={() => onDelete(task)}
-          style={{
-            padding: '6px',
-            borderRadius: '6px',
-            border: 'none',
-            backgroundColor: 'transparent',
-            color: '#646473',
-            cursor: 'pointer',
-          }}
           title="Eliminar"
+          style={{ padding: '5px', borderRadius: '6px', border: 'none', background: 'transparent', color: '#55556a', cursor: 'pointer', transition: 'all 150ms' }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.1)'; e.currentTarget.style.color = '#f87171' }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#55556a' }}
         >
-          <Trash2 size={14} />
+          <Trash2 size={13} />
         </button>
       </div>
     </div>
