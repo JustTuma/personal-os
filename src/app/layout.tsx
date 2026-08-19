@@ -54,12 +54,16 @@ export default function RootLayout({
         {children}
         <Toaster
           position="bottom-right"
+          theme="dark"
           toastOptions={{
             style: {
-              background: 'rgb(24 24 32)',
-              border: '1px solid rgb(255 255 255 / 0.08)',
-              color: 'rgb(242 242 248)',
-              fontSize: '14px',
+              background: 'rgba(20, 20, 28, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(124, 58, 237, 0.1)',
+              color: '#eeeeff',
+              fontSize: '13.5px',
+              borderRadius: '12px',
             },
           }}
         />

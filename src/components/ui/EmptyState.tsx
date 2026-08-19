@@ -16,34 +16,37 @@ export function EmptyState({ icon: Icon, title, description, actionLabel, onActi
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '40px 20px',
+      padding: '48px 24px',
       textAlign: 'center',
     }}>
       {Icon && (
         <div style={{
-          width: '44px',
-          height: '44px',
-          borderRadius: '12px',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          position: 'relative',
+          width: '54px',
+          height: '54px',
+          borderRadius: '16px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '12px',
+          marginBottom: '16px',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
         }}>
-          <Icon size={20} color="#646473" />
+          <Icon size={24} color="#7c3aed" />
         </div>
       )}
-      <p style={{ fontSize: '14px', fontWeight: 600, color: '#f2f2f8', margin: '0 0 4px' }}>
+      <p style={{ fontSize: '15px', fontWeight: 700, color: '#eeeeff', margin: '0 0 6px', letterSpacing: '-0.01em' }}>
         {title}
       </p>
       {description && (
-        <p style={{ fontSize: '13px', color: '#646473', margin: 0, maxWidth: '280px', lineHeight: 1.4 }}>
+        <p style={{ fontSize: '13px', color: '#7070a0', margin: 0, maxWidth: '320px', lineHeight: 1.5 }}>
           {description}
         </p>
       )}
       {actionLabel && onAction && (
-        <div style={{ marginTop: '16px' }}>
-          <Button variant="outline" size="sm" onClick={onAction}>
+        <div style={{ marginTop: '20px' }}>
+          <Button size="sm" onClick={onAction}>
             {actionLabel}
           </Button>
         </div>

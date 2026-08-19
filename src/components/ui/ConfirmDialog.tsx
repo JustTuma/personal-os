@@ -25,25 +25,27 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
           <div style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            width: '42px',
+            height: '42px',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.14)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            boxShadow: '0 0 16px rgba(239, 68, 68, 0.2)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
           }}>
-            <AlertTriangle size={18} color="#f87171" />
+            <AlertTriangle size={20} color="#f87171" />
           </div>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: '13.5px', color: '#9898b8', margin: 0, lineHeight: 1.5 }}>
             {description}
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', paddingTop: '4px' }}>
           <Button variant="ghost" size="sm" onClick={onClose} disabled={isLoading}>
             Cancelar
           </Button>
