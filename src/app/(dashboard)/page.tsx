@@ -15,10 +15,23 @@ import { TransferForm } from '@/components/finances/TransferForm'
 import { Skeleton } from '@/components/ui/Skeleton'
 import {
   TrendingUp, TrendingDown, ArrowRight, Plus,
-  Receipt, ArrowUpRight, ArrowDownRight
+  Receipt, ArrowUpRight, ArrowDownRight, Wallet,
+  Target, RefreshCw, Sparkles
 } from 'lucide-react'
 import type { TransactionFormValues, TransferFormValues } from '@/lib/validations/transaction'
 import type { Currency } from '@/types'
+
+// ── Greeting ─────────────────────────────────────────────────
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Buenos días'
+  if (h < 18) return 'Buenas tardes'
+  return 'Buenas noches'
+}
+
+function getMonthLabel() {
+  return new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+}
 
 // ── Stat Card ─────────────────────────────────────────────────
 function StatCard({
@@ -28,36 +41,60 @@ function StatCard({
   change,
   isLoading,
   variant = 'default',
+  icon: Icon,
 }: {
   label: string
   value: number
   currency?: Currency
   change?: number
   isLoading?: boolean
-  variant?: 'default' | 'positive' | 'negative'
+  variant?: 'default' | 'positive' | 'negative' | 'accent'
+  icon?: React.ElementType
 }) {
-  const valueColor = variant === 'positive' ? '#4ade80' : variant === 'negative' ? '#f87171' : '#f2f2f8'
+  const cardClass =
+    variant === 'positive' ? 'stat-card stat-card-positive animate-slide-up' :
+    variant === 'negative' ? 'stat-card stat-card-negative animate-slide-up' :
+    variant === 'accent'   ? 'stat-card stat-card-accent animate-slide-up' :
+    'stat-card animate-slide-up'
+
+  const valueClass =
+    variant === 'positive' ? 'gradient-text-green' :
+    variant === 'negative' ? 'gradient-text-red' :
+    variant === 'accent'   ? 'gradient-text' : ''
+
+  const iconColor =
+    variant === 'positive' ? '#10b981' :
+    variant === 'negative' ? '#ef4444' :
+    variant === 'accent'   ? '#7c3aed' : '#7070a0'
+
+  const iconBg =
+    variant === 'positive' ? 'rgba(16,185,129,0.12)' :
+    variant === 'negative' ? 'rgba(239,68,68,0.12)' :
+    variant === 'accent'   ? 'rgba(124,58,237,0.12)' : 'rgba(255,255,255,0.05)'
 
   return (
-    <div style={{
-      backgroundColor: '#111117',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      borderRadius: '14px',
-      padding: '20px',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-    }}>
-      <p style={{
-        fontSize: '11px',
-        fontWeight: 600,
-        color: '#646473',
-        textTransform: 'uppercase',
-        letterSpacing: '0.06em',
-        marginBottom: '10px',
-      }}>
-        {label}
-      </p>
+    <div className={cardClass}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '14px' }}>
+        <p style={{
+          fontSize: '11px',
+          fontWeight: 600,
+          color: '#55556a',
+          textTransform: 'uppercase',
+          letterSpacing: '0.07em',
+        }}>
+          {label}
+        </p>
+        {Icon && (
+          <div style={{
+            width: '30px', height: '30px', borderRadius: '8px',
+            backgroundColor: iconBg,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <Icon size={15} color={iconColor} />
+          </div>
+        )}
+      </div>
+
       {isLoading ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <Skeleton className="h-8 w-2/3" />
@@ -65,25 +102,18 @@ function StatCard({
         </div>
       ) : (
         <>
-          <p style={{
-            fontSize: '24px',
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-            color: valueColor,
+          <p className={valueClass} style={{
+            fontSize: '26px',
+            fontWeight: 700,
+            letterSpacing: '-0.03em',
             margin: 0,
+            color: !valueClass ? '#eeeeff' : undefined,
           }}>
             {formatCurrency(value, currency)}
           </p>
           {change !== undefined && change !== 0 && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              marginTop: '6px',
-              fontSize: '12px',
-              color: change >= 0 ? '#4ade80' : '#f87171',
-            }}>
-              {change >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+            <div className={`tag ${change >= 0 ? 'tag-positive' : 'tag-negative'}`} style={{ marginTop: '10px', width: 'fit-content' }}>
+              {change >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
               <span>{Math.abs(change).toFixed(0)}% vs mes anterior</span>
             </div>
           )}
@@ -100,20 +130,9 @@ function SectionCard({ title, children, action }: {
   action?: React.ReactNode
 }) {
   return (
-    <div style={{
-      backgroundColor: '#111117',
-      border: '1px solid rgba(255, 255, 255, 0.08)',
-      borderRadius: '14px',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '14px 20px',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-      }}>
-        <h2 style={{ fontSize: '13.5px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
+    <div className="section-card animate-fade-in">
+      <div className="section-card-header">
+        <h2 style={{ fontSize: '13.5px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
           {title}
         </h2>
         {action}
@@ -190,7 +209,6 @@ export default function DashboardPage() {
 
     const filtered = results.filter(s => s.hasData)
     if (filtered.length === 0) {
-      // Default ARS placeholder stats
       return [{
         currency: 'ARS' as Currency,
         income: 0,
@@ -205,7 +223,7 @@ export default function DashboardPage() {
     return filtered
   }, [currentTx, prevTx, accounts])
 
-  // Chart data — last 6 months (ARS primary)
+  // Chart data
   const chartData = useMemo(() => {
     return last6Months.map(({ from, to, label }) => {
       const monthTx = allTx.filter(t => t.currency === 'ARS' && t.date >= from && t.date <= to)
@@ -254,28 +272,54 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div style={{
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+      {/* ── Header ── */}
+      <div className="animate-fade-in" style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '16px',
       }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
+          {/* Greeting pill */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 10px',
+            borderRadius: '999px',
+            backgroundColor: 'rgba(124,58,237,0.12)',
+            border: '1px solid rgba(124,58,237,0.22)',
+            marginBottom: '10px',
+          }}>
+            <Sparkles size={11} color="#a78bfa" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#a78bfa', letterSpacing: '0.04em' }}>
+              {getGreeting()}
+            </span>
+          </div>
+
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: 800,
+            color: '#eeeeff',
+            margin: 0,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.1,
+          }}>
             Dashboard
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
-            Resumen general del mes
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0', textTransform: 'capitalize' }}>
+            Resumen de {getMonthLabel()}
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Button
             variant="secondary"
             size="sm"
-            leftIcon={<ArrowRight size={15} color="#818cf8" />}
+            leftIcon={<ArrowRight size={14} color="#818cf8" />}
             onClick={() => setModal('transfer')}
           >
             Transferir
@@ -283,14 +327,14 @@ export default function DashboardPage() {
           <Button
             variant="secondary"
             size="sm"
-            leftIcon={<TrendingDown size={15} color="#f87171" />}
+            leftIcon={<TrendingDown size={14} color="#f87171" />}
             onClick={() => setModal('expense')}
           >
             Gasto
           </Button>
           <Button
             size="sm"
-            leftIcon={<Plus size={15} color="white" />}
+            leftIcon={<Plus size={14} color="white" />}
             onClick={() => setModal('income')}
           >
             Ingreso
@@ -298,20 +342,26 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Financial summary — KPI stat cards */}
+      {/* ── KPI Stat Cards ── */}
       {summary.map(s => (
         <div key={s.currency} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {summary.length > 1 && (
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
-              Moneda: {s.currency}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ height: '1px', flex: 1, background: 'var(--border)' }} />
+              <span style={{ fontSize: '11px', fontWeight: 700, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                {s.currency}
+              </span>
+              <div style={{ height: '1px', flex: 1, background: 'var(--border)' }} />
+            </div>
           )}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full stagger">
             <StatCard
               label="Dinero disponible"
               value={s.accountBalance}
               currency={s.currency}
               isLoading={isLoading}
+              icon={Wallet}
+              variant="accent"
             />
             <StatCard
               label="Ingresos del mes"
@@ -320,6 +370,7 @@ export default function DashboardPage() {
               change={s.incomeChange}
               variant="positive"
               isLoading={isLoading}
+              icon={TrendingUp}
             />
             <StatCard
               label="Gastos del mes"
@@ -328,6 +379,7 @@ export default function DashboardPage() {
               change={s.expenseChange}
               variant="negative"
               isLoading={isLoading}
+              icon={TrendingDown}
             />
             <StatCard
               label="Balance neto"
@@ -335,12 +387,13 @@ export default function DashboardPage() {
               currency={s.currency}
               variant={s.balance >= 0 ? 'default' : 'negative'}
               isLoading={isLoading}
+              icon={ArrowUpRight}
             />
           </div>
         </div>
       ))}
 
-      {/* Chart + Recent Activity */}
+      {/* ── Chart + Recent Activity ── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-5 w-full">
         {/* Chart */}
         <div style={{ minWidth: 0 }}>
@@ -368,71 +421,63 @@ export default function DashboardPage() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '10px',
               }}>
                 <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                  width: '48px', height: '48px', borderRadius: '14px',
+                  backgroundColor: 'rgba(124,58,237,0.1)',
+                  border: '1px solid rgba(124,58,237,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
                   marginBottom: '4px',
                 }}>
-                  <Receipt size={20} color="#646473" />
+                  <Receipt size={22} color="#7c3aed" />
                 </div>
-                <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#f2f2f8', margin: 0 }}>Sin movimientos</p>
-                <p style={{ fontSize: '12.5px', color: '#646473', margin: 0 }}>Los registros de este mes aparecerán acá</p>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>Sin movimientos</p>
+                <p style={{ fontSize: '13px', color: '#55556a', margin: 0 }}>Los registros de este mes aparecerán acá</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {recentActivity.map((item, idx) => (
                   <div
                     key={item.id}
+                    className="activity-item"
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 20px',
-                      borderBottom: idx !== recentActivity.length - 1 ? '1px solid rgba(255, 255, 255, 0.05)' : 'none',
-                      transition: 'background 120ms',
+                      borderBottom: idx !== recentActivity.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
                     }}
                   >
                     <div style={{
-                      width: '34px',
-                      height: '34px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      width: '36px', height: '36px', borderRadius: '10px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                       flexShrink: 0,
                       backgroundColor:
-                        item.type === 'income' ? 'rgba(34, 197, 94, 0.12)' :
-                        item.type === 'expense' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(99, 102, 241, 0.12)',
+                        item.type === 'income'   ? 'rgba(16, 185, 129, 0.12)' :
+                        item.type === 'expense'  ? 'rgba(239, 68, 68, 0.12)'  : 'rgba(124, 58, 237, 0.12)',
                     }}>
-                      {item.type === 'income' && <TrendingUp size={15} color="#4ade80" />}
-                      {item.type === 'expense' && <TrendingDown size={15} color="#f87171" />}
-                      {item.type === 'transfer' && <ArrowRight size={15} color="#818cf8" />}
+                      {item.type === 'income'   && <TrendingUp size={16} color="#34d399" />}
+                      {item.type === 'expense'  && <TrendingDown size={16} color="#f87171" />}
+                      {item.type === 'transfer' && <ArrowRight size={16} color="#a78bfa" />}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '13.5px', fontWeight: 500, color: '#f2f2f8', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{
+                        fontSize: '13.5px', fontWeight: 500, color: '#eeeeff', margin: 0,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
                         {item.title}
                       </p>
-                      <p style={{ fontSize: '12px', color: '#646473', margin: '2px 0 0' }}>
+                      <p style={{ fontSize: '12px', color: '#55556a', margin: '2px 0 0' }}>
                         {formatDateRelative(item.date)}
                       </p>
                     </div>
                     {item.amount && item.currency && (
                       <span style={{
                         fontSize: '13.5px',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         flexShrink: 0,
                         color:
-                          item.type === 'income' ? '#4ade80' :
-                          item.type === 'expense' ? '#f87171' : '#818cf8',
+                          item.type === 'income'   ? '#34d399' :
+                          item.type === 'expense'  ? '#f87171' : '#a78bfa',
                       }}>
-                        {item.type === 'income' && '+'}
+                        {item.type === 'income'  && '+'}
                         {item.type === 'expense' && '-'}
                         {formatCurrency(item.amount, item.currency)}
                       </span>
@@ -445,7 +490,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Upcoming Subscriptions if any */}
+      {/* ── Upcoming Subscriptions ── */}
       {activeSubscriptions.length > 0 && (
         <SectionCard
           title="Próximos cobros de suscripciones"
@@ -455,7 +500,7 @@ export default function DashboardPage() {
             </Button>
           }
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-3 sm:p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
             {activeSubscriptions.map(sub => (
               <div
                 key={sub.id}
@@ -463,21 +508,33 @@ export default function DashboardPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  padding: '12px 16px',
-                  backgroundColor: '#181820',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  padding: '13px 16px',
+                  backgroundColor: 'rgba(245,158,11,0.06)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(245,158,11,0.15)',
+                  transition: 'border-color 150ms',
                 }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(245,158,11,0.3)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(245,158,11,0.15)')}
               >
-                <div>
-                  <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-                    {sub.name}
-                  </p>
-                  <p style={{ fontSize: '12px', color: '#a0a0b0', margin: '2px 0 0' }}>
-                    Vence: {sub.next_payment_date}
-                  </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '8px',
+                    backgroundColor: 'rgba(245,158,11,0.15)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <RefreshCw size={15} color="#f59e0b" />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                      {sub.name}
+                    </p>
+                    <p style={{ fontSize: '11.5px', color: '#7070a0', margin: '2px 0 0' }}>
+                      Vence: {sub.next_payment_date}
+                    </p>
+                  </div>
                 </div>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#f2f2f8' }}>
+                <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#fbbf24', flexShrink: 0 }}>
                   {formatCurrency(sub.amount, sub.currency)}
                 </span>
               </div>
@@ -486,7 +543,7 @@ export default function DashboardPage() {
         </SectionCard>
       )}
 
-      {/* Active Financial Goals if any */}
+      {/* ── Active Financial Goals ── */}
       {activeGoals.length > 0 && (
         <SectionCard
           title="Metas de ahorro en curso"
@@ -496,35 +553,68 @@ export default function DashboardPage() {
             </Button>
           }
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-3 sm:p-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4">
             {activeGoals.map(g => {
               const progress = Math.min(100, Math.round((g.current_amount / g.target_amount) * 100))
+              const goalColor = g.color || '#7c3aed'
               return (
                 <div
                   key={g.id}
                   style={{
-                    padding: '14px 16px',
-                    backgroundColor: '#181820',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    padding: '16px',
+                    backgroundColor: `${goalColor}0d`,
+                    borderRadius: '14px',
+                    border: `1px solid ${goalColor}25`,
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '10px',
+                    gap: '12px',
+                    transition: 'border-color 160ms, box-shadow 160ms',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.borderColor = `${goalColor}50`
+                    e.currentTarget.style.boxShadow = `0 0 16px ${goalColor}18`
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.borderColor = `${goalColor}25`
+                    e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#f2f2f8', margin: 0 }}>
-                      {g.name}
-                    </p>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: g.color || '#818cf8' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{
+                        width: '28px', height: '28px', borderRadius: '7px',
+                        backgroundColor: `${goalColor}22`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <Target size={14} color={goalColor} />
+                      </div>
+                      <p style={{ fontSize: '13.5px', fontWeight: 600, color: '#eeeeff', margin: 0 }}>
+                        {g.name}
+                      </p>
+                    </div>
+                    <span style={{
+                      fontSize: '12px', fontWeight: 700,
+                      color: goalColor,
+                      background: `${goalColor}18`,
+                      padding: '2px 8px', borderRadius: '999px',
+                    }}>
                       {progress}%
                     </span>
                   </div>
-                  <div style={{ width: '100%', height: '6px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '999px', overflow: 'hidden' }}>
-                    <div style={{ width: `${progress}%`, height: '100%', backgroundColor: g.color || '#6366f1', borderRadius: '999px' }} />
+
+                  {/* Progress bar */}
+                  <div className="progress-track">
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width: `${progress}%`,
+                        background: `linear-gradient(90deg, ${goalColor}cc, ${goalColor})`,
+                      }}
+                    />
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#646473' }}>
-                    <span>{formatCurrency(g.current_amount, g.currency)}</span>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#7070a0' }}>
+                    <span style={{ fontWeight: 500 }}>{formatCurrency(g.current_amount, g.currency)}</span>
                     <span>Meta: {formatCurrency(g.target_amount, g.currency)}</span>
                   </div>
                 </div>
@@ -534,7 +624,7 @@ export default function DashboardPage() {
         </SectionCard>
       )}
 
-      {/* Modals */}
+      {/* ── Modals ── */}
       <Modal
         isOpen={modal === 'income' || modal === 'expense'}
         onClose={() => setModal(null)}

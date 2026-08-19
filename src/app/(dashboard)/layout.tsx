@@ -16,14 +16,14 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#0b0b0f' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'transparent' }}>
       {/* Desktop sidebar */}
       <div className="hidden md:block" style={{ width: '240px', flexShrink: 0 }}>
         <Sidebar />
       </div>
 
       {/* Main content */}
-      <main className="dashboard-main-container flex-1 min-h-screen bg-[#0b0b0f] overflow-y-auto">
+      <main className="dashboard-main-container flex-1 min-h-screen overflow-y-auto">
         <div style={{ maxWidth: '1360px', margin: '0 auto' }}>
           {children}
         </div>

@@ -11,7 +11,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonCard } from '@/components/ui/Skeleton'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { formatCurrency } from '@/lib/utils/currency'
-import { Target, Plus } from 'lucide-react'
+import { Target, Plus, CheckCircle2, TrendingUp } from 'lucide-react'
 import type { GoalFormValues, ContributionFormValues } from '@/lib/validations/goal'
 
 export default function GoalsPage() {
@@ -32,7 +32,6 @@ export default function GoalsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Calculations for summary stats
   const stats = useMemo(() => {
     let totalSavedARS = 0
     let totalTargetARS = 0
@@ -63,7 +62,6 @@ export default function GoalsPage() {
     }
   }, [goals])
 
-  // Filtered goals
   const filteredGoals = useMemo(() => {
     if (filter === 'active') return goals.filter(g => g.status === 'active')
     if (filter === 'completed') return goals.filter(g => g.status === 'completed' || g.current_amount >= g.target_amount)
@@ -107,115 +105,199 @@ export default function GoalsPage() {
     await addContribution(goal, values)
   }
 
+  const filterTabs = [
+    { key: 'all' as const, label: `Todas`, count: goals.length },
+    { key: 'active' as const, label: `En progreso`, count: goals.filter(g => g.status === 'active' && g.current_amount < g.target_amount).length },
+    { key: 'completed' as const, label: `Completadas`, count: goals.filter(g => g.status === 'completed' || g.current_amount >= g.target_amount).length },
+    { key: 'paused' as const, label: `Pausadas`, count: goals.filter(g => g.status === 'paused').length },
+  ]
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      {/* Header */}
-      <div style={{
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+
+      {/* ── Header ── */}
+      <div className="animate-fade-in" style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '16px',
       }}>
         <div>
-          <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            Objetivos Financieros
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '4px 10px',
+            borderRadius: '999px',
+            backgroundColor: 'rgba(167,139,250,0.12)',
+            border: '1px solid rgba(167,139,250,0.25)',
+            marginBottom: '10px',
+          }}>
+            <Target size={11} color="#a78bfa" />
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#a78bfa', letterSpacing: '0.04em' }}>
+              Metas financieras
+            </span>
+          </div>
+
+          <h1 style={{
+            fontSize: '28px',
+            fontWeight: 800,
+            color: '#eeeeff',
+            margin: 0,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.1,
+          }}>
+            Objetivos
           </h1>
-          <p style={{ fontSize: '13.5px', color: '#a0a0b0', margin: '4px 0 0' }}>
+          <p style={{ fontSize: '13.5px', color: '#7070a0', margin: '6px 0 0' }}>
             Seguimiento de metas de ahorro, compras y fondos
           </p>
         </div>
-        <Button leftIcon={<Plus size={15} color="white" />} onClick={() => setShowCreate(true)}>
+
+        <Button
+          leftIcon={<Plus size={15} color="white" />}
+          onClick={() => setShowCreate(true)}
+        >
           Nuevo objetivo
         </Button>
       </div>
 
-      {/* KPI Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '16px',
-      }}>
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>
-            Ahorrado en Objetivos (ARS)
-          </p>
-          <p style={{ fontSize: '24px', fontWeight: 600, color: '#4ade80', margin: 0, letterSpacing: '-0.02em' }}>
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger animate-slide-up">
+
+        {/* ARS saved */}
+        <div className="stat-card stat-card-positive" style={{ position: 'relative' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              Ahorrado (ARS)
+            </p>
+            <div style={{
+              width: '30px', height: '30px', borderRadius: '8px',
+              backgroundColor: 'rgba(16,185,129,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <TrendingUp size={15} color="#10b981" />
+            </div>
+          </div>
+          <p className="gradient-text-green" style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0 }}>
             {formatCurrency(stats.totalSavedARS, 'ARS')}
           </p>
-          <p style={{ fontSize: '12px', color: '#646473', margin: '4px 0 0' }}>
-            Meta total: {formatCurrency(stats.totalTargetARS, 'ARS')} ({stats.progressARS}%)
-          </p>
+          <div style={{ marginTop: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#7070a0', marginBottom: '6px' }}>
+              <span>Progreso total</span>
+              <span style={{ fontWeight: 600, color: '#34d399' }}>{stats.progressARS}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill progress-fill-green" style={{ width: `${stats.progressARS}%` }} />
+            </div>
+            <p style={{ fontSize: '11.5px', color: '#55556a', margin: '6px 0 0' }}>
+              Meta: {formatCurrency(stats.totalTargetARS, 'ARS')}
+            </p>
+          </div>
         </div>
 
+        {/* USD saved (conditional) */}
         {stats.totalTargetUSD > 0 && (
-          <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>
-              Ahorrado en Objetivos (USD)
-            </p>
-            <p style={{ fontSize: '24px', fontWeight: 600, color: '#4ade80', margin: 0, letterSpacing: '-0.02em' }}>
+          <div className="stat-card stat-card-accent">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+              <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+                Ahorrado (USD)
+              </p>
+              <div style={{
+                width: '30px', height: '30px', borderRadius: '8px',
+                backgroundColor: 'rgba(124,58,237,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <TrendingUp size={15} color="#7c3aed" />
+              </div>
+            </div>
+            <p className="gradient-text" style={{ fontSize: '26px', fontWeight: 700, letterSpacing: '-0.03em', margin: 0 }}>
               {formatCurrency(stats.totalSavedUSD, 'USD')}
             </p>
-            <p style={{ fontSize: '12px', color: '#646473', margin: '4px 0 0' }}>
-              Meta total: {formatCurrency(stats.totalTargetUSD, 'USD')} ({stats.progressUSD}%)
-            </p>
+            <div style={{ marginTop: '10px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#7070a0', marginBottom: '6px' }}>
+                <span>Progreso total</span>
+                <span style={{ fontWeight: 600, color: '#a78bfa' }}>{stats.progressUSD}%</span>
+              </div>
+              <div className="progress-track">
+                <div className="progress-fill" style={{ width: `${stats.progressUSD}%` }} />
+              </div>
+              <p style={{ fontSize: '11.5px', color: '#55556a', margin: '6px 0 0' }}>
+                Meta: {formatCurrency(stats.totalTargetUSD, 'USD')}
+              </p>
+            </div>
           </div>
         )}
 
-        <div style={{ backgroundColor: '#111117', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '14px', padding: '20px' }}>
-          <p style={{ fontSize: '11px', fontWeight: 600, color: '#646473', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>
-            Metas cumplidas
-          </p>
-          <p style={{ fontSize: '24px', fontWeight: 600, color: '#f2f2f8', margin: 0, letterSpacing: '-0.02em' }}>
-            {stats.completedCount} <span style={{ fontSize: '14px', fontWeight: 400, color: '#646473' }}>/ {stats.totalCount} metas</span>
-          </p>
-          <p style={{ fontSize: '12px', color: '#646473', margin: '4px 0 0' }}>
+        {/* Completed count */}
+        <div className="stat-card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
+            <p style={{ fontSize: '11px', fontWeight: 600, color: '#55556a', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
+              Metas cumplidas
+            </p>
+            <div style={{
+              width: '30px', height: '30px', borderRadius: '8px',
+              backgroundColor: 'rgba(52,211,153,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <CheckCircle2 size={15} color="#34d399" />
+            </div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+            <p style={{ fontSize: '36px', fontWeight: 800, color: '#eeeeff', margin: 0, letterSpacing: '-0.04em' }}>
+              {stats.completedCount}
+            </p>
+            <span style={{ fontSize: '14px', color: '#55556a', fontWeight: 500 }}>
+              / {stats.totalCount}
+            </span>
+          </div>
+          <p style={{ fontSize: '12px', color: '#7070a0', margin: '8px 0 0' }}>
             {stats.totalCount - stats.completedCount} activas en curso
           </p>
+          {stats.totalCount > 0 && (
+            <div style={{ marginTop: '10px' }}>
+              <div className="progress-track">
+                <div
+                  className="progress-fill progress-fill-green"
+                  style={{ width: `${Math.round((stats.completedCount / stats.totalCount) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Filter Tabs */}
+      {/* ── Filter Tabs ── */}
       {goals.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '8px' }}>
-          {(['all', 'active', 'completed', 'paused'] as const).map(tab => (
+        <div className="filter-tabs animate-fade-in">
+          {filterTabs.map(tab => (
             <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '8px',
-                border: 'none',
-                backgroundColor: filter === tab ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
-                color: filter === tab ? '#818cf8' : '#a0a0b0',
-                fontSize: '13px',
-                fontWeight: filter === tab ? 600 : 400,
-                cursor: 'pointer',
-                transition: 'all 120ms',
-              }}
+              key={tab.key}
+              onClick={() => setFilter(tab.key)}
+              className={`filter-tab ${filter === tab.key ? 'filter-tab-active' : ''}`}
             >
-              {tab === 'all' && `Todas (${goals.length})`}
-              {tab === 'active' && `En progreso (${goals.filter(g => g.status === 'active' && g.current_amount < g.target_amount).length})`}
-              {tab === 'completed' && `Completadas (${goals.filter(g => g.status === 'completed' || g.current_amount >= g.target_amount).length})`}
-              {tab === 'paused' && `Pausadas (${goals.filter(g => g.status === 'paused').length})`}
+              {tab.label}
+              <span style={{
+                marginLeft: '5px',
+                fontSize: '11px',
+                fontWeight: 600,
+                opacity: 0.7,
+              }}>
+                {tab.count}
+              </span>
             </button>
           ))}
         </div>
       )}
 
-      {/* Goals Grid */}
+      {/* ── Goals Grid ── */}
       {isLoading ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
           {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : filteredGoals.length === 0 ? (
-        <div style={{
-          backgroundColor: '#111117',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '14px',
-          padding: '48px 24px',
-          textAlign: 'center',
-        }}>
+        <div className="glass-card" style={{ padding: '56px 24px', textAlign: 'center' }}>
           <EmptyState
             icon={Target}
             title={filter === 'all' ? 'No tenés metas financieras todavía' : 'No hay metas en esta categoría'}
@@ -225,15 +307,19 @@ export default function GoalsPage() {
           />
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-          {filteredGoals.map(goal => (
-            <GoalCard
-              key={goal.id}
-              goal={goal}
-              onEdit={setEditing}
-              onDelete={setDeleting}
-              onContribute={setContributing}
-            />
+        <div
+          className="stagger"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}
+        >
+          {filteredGoals.map((goal, i) => (
+            <div key={goal.id} className="animate-slide-up" style={{ animationDelay: `${i * 60}ms` }}>
+              <GoalCard
+                goal={goal}
+                onEdit={setEditing}
+                onDelete={setDeleting}
+                onContribute={setContributing}
+              />
+            </div>
           ))}
         </div>
       )}
